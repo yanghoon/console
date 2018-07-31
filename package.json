@@ -22,7 +22,9 @@
     "k8s": "^0.4.15",
     "nodemon": "^1.18.3",
     "vue": "^2.5.2",
+    "vue-codemirror": "^4.0.5",
     "vue-router": "^3.0.1",
+    "vue2-codemirror-lite-js": "^3.5.10",
     "vuetify": "^1.1.8"
   },
   "devDependencies": {

@@ -7,6 +7,7 @@ import Axios from 'axios'   // http://vuejs.kr/update/2017/01/04/http-request-wi
 import router from './modules/router'
 import bootstrap from './modules/bootstrap'
 import vuetify from './modules/vuetify'
+import codemirror from './modules/codemirror'
 
 Vue.config.productionTip = false
 Vue.prototype.$http = Axios

@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Kube from '@/components/Kube'
 import KubeVuetify from '@/components/KubeVuetify'
+import Codemirror from '@/components/Codemirror'
 
 Vue.use(Router)
 
@@ -24,6 +25,11 @@ export default new Router({
       path: '/',
       name: 'KubeVuetify',
       component: KubeVuetify
+    },
+    {
+      path: '/code',
+      name: 'Codemirror',
+      component: Codemirror
     }
   ]
 })
