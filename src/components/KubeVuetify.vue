@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app class="grey lighten-4">
     <v-content>
       <v-container fluid>
 
@@ -20,15 +20,28 @@
               <td class="text-xs-center">{{ "-" }}</td>
               <td class="text-xs-center">{{ props.item.status.startTime }}</td>
               <td class="text-xs-center">
-                <v-btn color="primary" flat icon @click.native="editor.show=!editor.show; editor.selected=props.item">
-                  <v-icon>create</v-icon>
-                </v-btn>
-                <v-btn color="primary" flat icon>
-                  <v-icon>web_asset</v-icon>
-                </v-btn>
-                <v-btn color="primary" flat icon>
-                  <v-icon>notes</v-icon>
-                </v-btn>
+
+                <v-tooltip right :open-delay="0" :close-delay="0">
+                  <v-btn slot="activator" color="primary" flat icon
+                         @click.native="showEditor(props.item)">
+                    <v-icon>create</v-icon>
+                  </v-btn>
+                  <span>Edit Yaml</span>
+                </v-tooltip>
+
+                <v-tooltip right :open-delay="0" :close-delay="0">
+                  <v-btn slot="activator" color="primary" flat icon disabled>
+                    <v-icon>web_asset</v-icon>
+                  </v-btn>
+                  <span>Open Shell</span>
+                </v-tooltip>
+
+                <v-tooltip right :open-delay="0" :close-delay="0">
+                  <v-btn slot="activator" color="primary" flat icon disabled>
+                    <v-icon>notes</v-icon>
+                  </v-btn>
+                  <span>Logs</span>
+                </v-tooltip>
               </td>
             </template>
 
@@ -43,7 +56,7 @@
 
     <v-dialog v-model="editor.show" width="700">
       <v-card>
-        <v-card-title class="headline grey lighten-2"primary-title>
+        <v-card-title class="headline grey lighten-2" primary-title>
           {{ editor.selected && editor.selected.metadata.name }}
         </v-card-title>
 
@@ -53,7 +66,7 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="editor.show = false">Save</v-btn>
+          <v-btn color="blue darken-1" flat @click.native="editor.show = false" disabled>Save</v-btn>
           <v-btn color="blue darken-1" flat @click.native="editor.show = false">Close</v-btn>
         </v-card-actions>
       </v-card>
@@ -108,16 +121,7 @@ function handler(comp, pods){
 }
 
 import 'codemirror/theme/base16-dark.css'
-
 import 'codemirror/mode/yaml/yaml.js'
-import 'codemirror/mode/xml/xml.js'
-
-import 'codemirror/addon/hint/show-hint.css'
-import 'codemirror/addon/hint/show-hint.js'
-import 'codemirror/addon/hint/xml-hint.js'
-import 'codemirror/addon/hint/html-hint.js'
-
-import 'codemirror/mode/htmlmixed/htmlmixed.js'
 
 export default {
   name: 'Kube',
@@ -133,15 +137,14 @@ export default {
       editor: {
         show: false,
         selected: null,
-        code: "<html></html>",
+        code: "(Loading...)",
         options: {
           // codemirror options
           tabSize: 2,
-          mode: 'text/html',
+          mode: 'text/x-yaml',
           theme: 'base16-dark',
           lineNumbers: true,
-          line: true,
-          extraKeys: {"Ctrl-Space": "autocomplete"}
+          line: true
         }
       }
     }
@@ -157,8 +160,21 @@ export default {
       this.$http
         .get(`${api}/pod`)
         .then((res)=>{
-          handler(this, res.data)
+          this.pod = res.data
+          this.table.items = res.data.items
           this.table.loading = false
+        })
+    },
+    showEditor (item) {
+      this.editor.show=!this.editor.show;
+      this.editor.selected = item;
+
+      var api = '/api'
+      this.$http
+        .get(`${api}/pod/${item.metadata.name}?type=yaml`)
+        .then((res)=>{
+          console.log(res)
+          this.editor.code = res.data
         })
     }
   }

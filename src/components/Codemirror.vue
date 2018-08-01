@@ -1,5 +1,5 @@
 <template>
-  <codemirror :code="'var a = 1'" :options="options"></codemirror>
+  <codemirror :code="code" :options="options"></codemirror>
 </template>
 
 <script>
@@ -17,6 +17,7 @@ export default {
   name: 'Kube',
   data () {
     return {
+      code: '<!-- By "Ctrl-Space", you can use autocomplete for HTML. -->',
       options: {
         // codemirror options
         tabSize: 2,

@@ -112,8 +112,17 @@ app.get("/api/:resource", (req, res) => {
   }
 
   kind.list().then(function(items){
-  	console.log(req.params)
+  	console.log(req.url, req.params)
   	res.send(items)
+  })
+})
+
+app.get("/api/:resource/:name", (req, res) => {
+  cmd = `get ${req.params.resource} ${req.params.name} --output=${req.query.type || 'json'}`
+
+  kubectl.command(cmd).then(function(pod){
+  	console.log(req.url, req.params)
+  	res.send(pod)
   })
 })
 
