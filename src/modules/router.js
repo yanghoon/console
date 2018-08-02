@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld'
 import Kube from '@/components/Kube'
 import KubeVuetify from '@/components/KubeVuetify'
 import Codemirror from '@/components/Codemirror'
+import Ssh from '@/components/Ssh'
 
 Vue.use(Router)
 
@@ -30,6 +31,11 @@ export default new Router({
       path: '/code',
       name: 'Codemirror',
       component: Codemirror
+    },
+    {
+      path: '/ssh',
+      name: 'Ssh',
+      component: Ssh
     }
   ]
 })
