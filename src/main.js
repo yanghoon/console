@@ -8,6 +8,7 @@ import router from './modules/router'
 import bootstrap from './modules/bootstrap'
 import vuetify from './modules/vuetify'
 import codemirror from './modules/codemirror'
+//import xterm from './modules/'
 
 Vue.config.productionTip = false
 Vue.prototype.$http = Axios

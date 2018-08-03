@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const expressWs = require('express-ws')(app);
 
+const WebSocket = require('ws');
 
 var fs = require('fs')
 var K8s = require('k8s')
@@ -13,14 +14,55 @@ var kubectl = K8s.kubectl({
 app.use(express.static("dist"));
 
 
-app.ws('/api/shell', function(ws, req){
+app.ws('/api/shell', function(client, req){
   // https://stackoverflow.com/a/39233132
-  console.log(req)
-  console.log('socket', req.testing)
+  //console.log(req)
 
-  ws.on('message', function(msg){
-    console.log(msg);
-    ws.send(msg + " !!")
+  var init = false;
+  function openShell(client, info){
+    var url = info.server + info.endpoint + '/exec?container=mypod&stdin=1&stdout=1&stderr=1&tty=1&command=bash';
+    var protocol = info.protocol;
+    var headers = info.headers;
+    var opts = {
+      headers: headers,
+      ca: new Buffer(info.ca, 'base64')
+    }
+
+    console.log(url)
+    console.log(protocol)
+    console.log(headers)
+    console.log(opts)
+
+    ws = new WebSocket(url, protocol, opts)
+    ws.on('open',  () => { console.log('K8S-SHELL :: Open')})
+    ws.on('error', (err) => { console.log('K8S-SHELL :: Error - ', err.message)})
+    ws.on('close', (code) => { console.log('K8S-SHELL :: Close - ', code)})
+    ws.on('ping', () => { console.log('K8S-SHELL :: Ping')})
+    ws.on('pong', () => { console.log('K8S-SHELL :: Pong')})
+    ws.on('message', (data) => {
+      // https://stackoverflow.com/a/38237610
+      var msg = Buffer.from(data.substring(1), 'base64').toString()
+      if(msg)
+        console.log("K8S-SHELL :: MESSAGE ", data, msg)
+      client.send(msg)
+    })
+  }
+
+  client.on('message', function(msg){
+    //console.log(msg);
+
+    if(!init){
+      init = true;
+      client.send('Try to connect the pod.\r\n') 
+
+      openShell(client, JSON.parse(msg))
+      return;
+    }
+
+    // https://stackoverflow.com/a/38237610
+    var chunk = '0' + Buffer.from(msg + '\n').toString('base64')
+    console.log('K8S-SHELL :: SEND ', chunk, msg)
+    ws.send(chunk)
   })
 })
 

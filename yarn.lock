@@ -7803,6 +7803,12 @@ vue-template-es2015-compiler@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.6.0.tgz#dc42697133302ce3017524356a6c61b7b69b4a18"
 
+vue-term@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/vue-term/-/vue-term-0.1.2.tgz#02dfe994e85644bb234607f6c155757bea92d8eb"
+  dependencies:
+    xterm "^3.0.2"
+
 vue2-codemirror-lite-js@^3.5.10:
   version "3.5.10"
   resolved "https://registry.yarnpkg.com/vue2-codemirror-lite-js/-/vue2-codemirror-lite-js-3.5.10.tgz#2276b64a8c6699849f632ae18b5ce87255b76bc9"
@@ -8089,6 +8095,10 @@ xregexp@2.0.0:
 xtend@^4.0.0, xtend@~4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/xtend/-/xtend-4.0.1.tgz#a5c6d532be656e23db820efb943a1f04998d63af"
+
+xterm@^3.0.2, xterm@^3.5.1:
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/xterm/-/xterm-3.5.1.tgz#d2e62ab26108a771b7bd1b7be4f6578fb4aff922"
 
 xxhashjs@^0.2.1:
   version "0.2.2"
