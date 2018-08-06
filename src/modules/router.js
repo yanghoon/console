@@ -1,8 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
-import Kube from '@/components/Kube'
-import KubeVuetify from '@/components/KubeVuetify'
+import Pods from '@/components/Pods'
 import Codemirror from '@/components/Codemirror'
 import Ssh from '@/components/Ssh'
 
@@ -17,15 +16,15 @@ export default new Router({
       name: 'HelloWorld',
       component: HelloWorld
     },
-    {
+/*    {
       path: '/kube',
       name: 'Kube',
       component: Kube
-    },
+    }, */
     {
       path: '/',
-      name: 'KubeVuetify',
-      component: KubeVuetify
+      name: 'Pods',
+      component: Pods
     },
     {
       path: '/code',

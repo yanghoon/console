@@ -1,5 +1,12 @@
 <template>
-  <codemirror :code="code" :options="options"></codemirror>
+  <v-container fluid>
+    <v-layout row wrap align-center justify-center>
+      <v-flex xs11>
+
+        <codemirror :code="code" :options="options"></codemirror>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
@@ -17,7 +24,7 @@ export default {
   name: 'Kube',
   data () {
     return {
-      code: '<!-- By "Ctrl-Space", you can use autocomplete for HTML. -->',
+      code: '<!-- By "Ctrl-Space", you can use autocomplete for HTML. -->\n',
       options: {
         // codemirror options
         tabSize: 2,

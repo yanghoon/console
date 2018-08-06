@@ -1,7 +1,12 @@
 <template>
-  <v-app class="grey lighten-4">
-    <v-content>
-      <v-container>
+  <!--
+  Layout Configure
+  - https://vuetifyjs.com/ko/layout/pre-defined#default-markup
+  - https://vuetifyjs.com/ko/layout/grid#example-playground
+  -->
+  <v-container fluid>
+    <v-layout row wrap align-center justify-center>
+      <v-flex xs11>
 
         <form>
           <v-text-field v-model="endpoint" label="Pod Endpoint" required></v-text-field>
@@ -24,9 +29,9 @@
 
         <div class="console"></div>
 
-      </v-container>
-    </v-content>
-  </v-app>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>

@@ -1,7 +1,7 @@
 <template>
-  <v-app class="grey lighten-4">
-    <v-content>
-      <v-container fluid>
+  <v-container fluid>
+    <v-layout row wrap align-center justify-center>
+      <v-flex xs11>
 
         <v-card>
           <v-card-title>
@@ -51,8 +51,8 @@
           </v-data-table>
         </v-card>
 
-      </v-container>
-    </v-content>
+      </v-flex>
+    </v-layout>
 
     <v-dialog v-model="editor.show" width="700">
       <v-card>
@@ -71,7 +71,8 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-  </v-app>
+
+  </v-container>
 </template>
 
 <script>
