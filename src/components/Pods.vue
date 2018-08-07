@@ -3,6 +3,34 @@
     <v-layout row wrap align-center justify-center>
       <v-flex xs11>
 
+        <!--
+        <v-breadcrumbs divider="-">
+          <v-breadcrumbs-item v-for="(sel, index) in select" :key="index">
+            <v-select :items="sel.items"
+                item-text="name" item-value="name"
+                :label="sel.label" v-model="sel.selected" @change="getNamespace">
+            </v-select>
+
+          </v-breadcrumbs-item>
+        </v-breadcrumbs>
+        -->
+
+        <v-layout row wrap align-center justify-start>
+          <v-flex xs2>
+            <v-select :items="select[0].items"
+                item-text="name" item-value="name"
+                :label="select[0].label" v-model="select[0].selected" @change="getNamespace">
+            </v-select>
+          </v-flex>
+          <div class="text-md-center"> <span>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</span> </div>
+          <v-flex xs2>
+            <v-select :items="select[1].items"
+                item-text="metadata.name" item-value="metadata.name"
+                :label="select[1].label" v-model="select[1].selected" @change="getPod">
+            </v-select>
+          </v-flex>
+        </v-layout>
+
         <v-card>
           <v-card-title>
             Pods
@@ -129,10 +157,22 @@ export default {
   data () {
     return {
       pod:{},
+      select: [
+        {
+          label: 'Cluster',
+          selected: undefined,
+          items: []
+        },
+        {
+          label: 'Namespace',
+          selected: undefined,
+          items: []
+        },
+      ],
       table: {
         headers: expandFields(),
         items: [],
-        loading: true,
+        loading: false,
         keyword: ""
       },
       editor: {
@@ -151,28 +191,54 @@ export default {
     }
   },
   mounted() {
-    this.getPod()
+    this.getCluster()
+    //this.getPod()
   },
   methods: {
     getPod () {
       var api = '/api'
 
+      var cluster = this.select[0].selected;
+      var ns = this.select[1].selected;
+
       this.table.loading = true
       this.$http
-        .get(`${api}/pod`)
+        .get(`${api}/cluster/${cluster}/namespace/${ns}/pod/list`)
         .then((res)=>{
           this.pod = res.data
           this.table.items = res.data.items
           this.table.loading = false
         })
     },
+    getCluster() {
+      var api = '/api'
+
+      this.$http
+        .get(`${api}/cluster/list`)
+        .then((res)=>{
+          this.select[0].items = res.data
+          this.select[1].items = res.data
+        })
+    },
+    getNamespace() {
+      var api = '/api'
+
+      this.$http
+        .get(`${api}/cluster/${this.select[0].selected}/namespace/list`)
+        .then((res)=>{
+          this.select[1].items = res.data.items
+        })
+    },
     showEditor (item) {
       this.editor.show=!this.editor.show;
       this.editor.selected = item;
 
+      var cs = this.select[0].selected;
+      var ns = this.select[1].selected;
+
       var api = '/api'
       this.$http
-        .get(`${api}/pod/${item.metadata.name}?type=yaml`)
+        .get(`${api}/pod/${item.metadata.name}?type=yaml&cluster=${cs}&ns=${ns}`)
         .then((res)=>{
           console.log(res)
           this.editor.code = res.data

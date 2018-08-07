@@ -1,5 +1,10 @@
 <template>
-  <!-- Layout Sample :: https://github.com/vuetifyjs/vuetifyjs.com/blob/master/src/examples/layouts/googleKeep.vue -->
+  <!--
+  Layout Sample
+  - https://github.com/vuetifyjs/vuetifyjs.com/blob/master/src/examples/layouts/googleKeep.vue
+  Icons
+  - https://material.io/tools/icons/?icon=desktop_access_disabled&style=baseline
+  -->
   <v-app class="grey lighten-4">
     <div class="toolbar-band blue darken-1"></div>
 
@@ -55,7 +60,8 @@ export default {
       menus: [
         {title:'Pods', link:'/', icon:'widgets'},
         {title:'Web SSH', link:'/ssh', icon:'web_asset'},
-        {title:'Editor', link:'/code', icon:'create'}
+        {title:'Editor', link:'/code', icon:'create'},
+        {title:'Configure', link:'/conf', icon:'settings'}
       ]
     }
   }
@@ -64,7 +70,7 @@ export default {
 
 <style>
 .toolbar-title { text-transform: none; }
-.toolbar-title.text { font-weight: 400; }
+.toolbar-title .text { font-weight: 400; }
 .toolbar-title:hover { text-decoration: none; }
 .toolbar-title.v-btn--active:before { background-color: inherit; }
 

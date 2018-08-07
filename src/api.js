@@ -1,18 +1,49 @@
+// express
 const express = require("express");
 const app = express();
-const expressWs = require('express-ws')(app);
 
+// websocket
+const expressWs = require('express-ws')(app);
 const WebSocket = require('ws');
 
-var fs = require('fs')
+// for kube
 var K8s = require('k8s')
-var kubectl = K8s.kubectl({
-    binary: 'kubectl'
-})
 
+// service
+var cluster = require('./modules/service/cluster');
 
 app.use(express.static("dist"));
 
+// file upload :: http://webframeworks.kr/tutorials/expressjs/expressjs_file_upload/
+app.get("/api/cluster/list", (req, res) => {
+  res.send(cluster.clusterNames());
+})
+
+app.get("/api/cluster/:cluster/namespace/list", (req, res) => {
+  var kubectl = K8s.kubectl({
+    binary: 'kubectl',
+    kubeconfig: cluster.getPath(req.params.cluster)
+  })
+
+  cmd = `get ns --output=json`
+  kubectl.command(cmd).then(function(ns){
+    console.log(req.url, req.params)
+    res.send(ns)
+  }) 
+})
+
+app.get("/api/cluster/:cluster/namespace/:ns/pod/list", (req, res) => {
+  var kubectl = K8s.kubectl({
+    binary: 'kubectl',
+    kubeconfig: cluster.getPath(req.params.cluster)
+  })
+
+  cmd = `get pod --namespace=${req.params.ns} --output=json`
+  kubectl.command(cmd).then(function(ns){
+    console.log(req.url, req.params)
+    res.send(ns)
+  }) 
+})
 
 app.ws('/api/shell', function(client, req){
   // https://stackoverflow.com/a/39233132
@@ -82,6 +113,10 @@ app.get("/api/shell/info", (req, res) => {
 })
 
 app.get("/api/:resource", (req, res) => {
+  var kubectl = K8s.kubectl({
+    binary: 'kubectl',
+    kubeconfig: cluster.getPath(req.params.cluster)
+  })
   var kind = kubectl[req.params.resource]
   if(!kind){
   	//ERR!!
@@ -96,7 +131,13 @@ app.get("/api/:resource", (req, res) => {
 })
 
 app.get("/api/:resource/:name", (req, res) => {
-  cmd = `get ${req.params.resource} ${req.params.name} --output=${req.query.type || 'json'}`
+  console.log('!!!!!', req.url, req.params, req.query)
+
+  var kubectl = K8s.kubectl({
+    binary: 'kubectl',
+    kubeconfig: cluster.getPath(req.query.cluster)
+  })
+  cmd = `get ${req.params.resource} ${req.params.name} -n ${req.query.ns} --output=${req.query.type || 'json'}`
 
   kubectl.command(cmd).then(function(pod){
   	console.log(req.url, req.params)
