@@ -53,7 +53,7 @@
             <template slot="items" slot-scope="props">
               <td class="text-xs-left">{{ props.item.metadata.name }}</td>
               <td class="text-xs-center">{{ "-" }}</td>
-              <td class="text-xs-center">{{ props.item.status.phase }}</td>
+              <td class="text-xs-center">{{ props.item.status ? props.item.status.phase : '-' }}</td>
               <td class="text-xs-center">{{ "-" }}</td>
               <!-- <td class="text-xs-center">{{ props.item.status.startTime }}</td> -->
               <td class="text-xs-center">{{ props.item.metadata.creationTimestamp }}</td>
@@ -182,6 +182,7 @@ export default {
           label: 'Kind',
           selected: undefined,
           items: [
+            {text:"Node", value:"node"},
             {text:"Deployment", value:"deployment"},
             {text:"Pod", value:"pod"},
             {text:"Service", value:"svc"},

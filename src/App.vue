@@ -58,7 +58,7 @@ export default {
     return {
       drawer: null,
       menus: [
-        {title:'Pods', link:'/', icon:'widgets'},
+        {title:'Resources', link:'/', icon:'widgets'},
         {title:'Web SSH', link:'/ssh', icon:'web_asset'},
         {title:'Editor', link:'/code', icon:'create'},
         {title:'Configure', link:'/conf', icon:'settings'}

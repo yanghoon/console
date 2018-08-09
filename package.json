@@ -11,7 +11,7 @@
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
     "build": "node build/build.js",
-    "dev-api": "nodemon src/api.js --watch src/modules --watch=src/api.js",
+    "dev-api": "nodemon src/api.js --watch src/modules --watch src/api.js",
     "dev-all": "concurrently \"yarn run dev\" \"yarn run dev-api\""
   },
   "dependencies": {
