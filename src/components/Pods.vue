@@ -217,7 +217,6 @@ export default {
         .get(`${api}/cluster/list`)
         .then((res)=>{
           this.select[0].items = res.data
-          this.select[1].items = res.data
         })
     },
     getNamespace() {

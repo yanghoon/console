@@ -75,7 +75,7 @@ export default {
 
       // https://github.com/websockets/wscat/blob/master/bin/wscat#L248
       function exec(info){
-        var url = `ws://10.250.44.162:8080${api}/shell`
+        var url = `ws://localhost:8080${api}/shell`
         const ws = new WebSocket(url);
         comp.ws = ws
 

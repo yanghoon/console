@@ -131,7 +131,7 @@ app.get("/api/:resource", (req, res) => {
 })
 
 app.get("/api/:resource/:name", (req, res) => {
-  console.log('!!!!!', req.url, req.params, req.query)
+  console.log(req.url, req.params, req.query)
 
   var kubectl = K8s.kubectl({
     binary: 'kubectl',
