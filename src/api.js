@@ -130,12 +130,22 @@ app.get("/api/:resource", (req, res) => {
   })
 })
 
+app.get("/api/:resource/list", (req, res) => {
+  var kubectl = K8s.kubectl({kubeconfig: cluster.getPath(req.query.cs)})
+  cmd = `get ${req.params.resource} -n ${req.query.ns} --output=json`
+
+  kubectl.command(cmd).then(function(list){
+    console.log(req.url, req.params)
+    res.send(list)
+  })
+})
+
 app.get("/api/:resource/:name", (req, res) => {
   console.log(req.url, req.params, req.query)
 
   var kubectl = K8s.kubectl({
     binary: 'kubectl',
-    kubeconfig: cluster.getPath(req.query.cluster)
+    kubeconfig: cluster.getPath(req.query.cs)
   })
   cmd = `get ${req.params.resource} ${req.params.name} -n ${req.query.ns} --output=${req.query.type || 'json'}`
 

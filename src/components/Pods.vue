@@ -18,15 +18,24 @@
         <v-layout row wrap align-center justify-start>
           <v-flex xs2>
             <v-select :items="select[0].items"
-                item-text="name" item-value="name"
+                item-text="name" item-value="name" auto
                 :label="select[0].label" v-model="select[0].selected" @change="getNamespace">
             </v-select>
           </v-flex>
+
           <div class="text-md-center"> <span>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</span> </div>
           <v-flex xs2>
             <v-select :items="select[1].items"
-                item-text="metadata.name" item-value="metadata.name"
-                :label="select[1].label" v-model="select[1].selected" @change="getPod">
+                item-text="metadata.name" item-value="metadata.name" auto
+                :label="select[1].label" v-model="select[1].selected">
+            </v-select>
+          </v-flex>
+
+          <div class="text-md-center" v-show="select[1].selected"> <span>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</span> </div>
+          <v-flex xs2 v-show="select[1].selected">
+            <v-select :items="select[2].items"
+                item-text="text" item-value="value" auto
+                :label="select[2].label" v-model="select[2].selected" @change="getResources">
             </v-select>
           </v-flex>
         </v-layout>
@@ -46,7 +55,8 @@
               <td class="text-xs-center">{{ "-" }}</td>
               <td class="text-xs-center">{{ props.item.status.phase }}</td>
               <td class="text-xs-center">{{ "-" }}</td>
-              <td class="text-xs-center">{{ props.item.status.startTime }}</td>
+              <!-- <td class="text-xs-center">{{ props.item.status.startTime }}</td> -->
+              <td class="text-xs-center">{{ props.item.metadata.creationTimestamp }}</td>
               <td class="text-xs-center">
 
                 <v-tooltip right :open-delay="0" :close-delay="0">
@@ -82,7 +92,7 @@
       </v-flex>
     </v-layout>
 
-    <v-dialog v-model="editor.show" width="700">
+    <v-dialog v-model="editor.show" max-width="1000">
       <v-card>
         <v-card-title class="headline grey lighten-2" primary-title>
           {{ editor.selected && editor.selected.metadata.name }}
@@ -168,6 +178,21 @@ export default {
           selected: undefined,
           items: []
         },
+        {
+          label: 'Kind',
+          selected: undefined,
+          items: [
+            {text:"Deployment", value:"deployment"},
+            {text:"Pod", value:"pod"},
+            {text:"Service", value:"svc"},
+            {text:"Ingress", value:"ing"},
+            //{text:"ConfigMap", value:"cm"},
+            {text:"Secret", value:"secrets"},
+            {text:"PersistentVolume", value:"pv"},
+            {text:"PersistentVolumeClaim", value:"pvc"},
+            {text:"StatefulSets", value:"statefulset"}
+          ]
+        },
       ],
       table: {
         headers: expandFields(),
@@ -234,13 +259,30 @@ export default {
 
       var cs = this.select[0].selected;
       var ns = this.select[1].selected;
+      var kind = this.select[2].selected;
 
       var api = '/api'
       this.$http
-        .get(`${api}/pod/${item.metadata.name}?type=yaml&cluster=${cs}&ns=${ns}`)
+        .get(`${api}/${kind}/${item.metadata.name}?type=yaml&cs=${cs}&ns=${ns}`)
         .then((res)=>{
           console.log(res)
           this.editor.code = res.data
+        })
+    },
+    getResources () {
+      var api = '/api'
+      var cs = this.select[0].selected;
+      var ns = this.select[1].selected;
+      var kind = this.select[2].selected;
+
+      this.table.loading = true
+      this.$http
+        .get(`${api}/${kind}/list?cs=${cs}&ns=${ns}`)
+        .then((res)=>{
+          console.log(res)
+          //this.pod = res.data
+          this.table.items = res.data.items
+          this.table.loading = false
         })
     }
   }
@@ -250,5 +292,6 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
 .vue-codemirror { text-align: left!important; }
+.CodeMirror { height: 500px; }
 .CodeMirror-hints { z-index: 203 !important; }
 </style>
