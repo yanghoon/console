@@ -8,7 +8,7 @@
           <v-breadcrumbs-item v-for="(sel, index) in select" :key="index">
             <v-select :items="sel.items"
                 item-text="name" item-value="name"
-                :label="sel.label" v-model="sel.selected" @change="getNamespace">
+                :label="sel.label" v-model="sel.selected" @change="changeCluster">
             </v-select>
 
           </v-breadcrumbs-item>
@@ -19,7 +19,7 @@
           <v-flex xs2>
             <v-select :items="select[0].items"
                 item-text="name" item-value="name" auto
-                :label="select[0].label" v-model="select[0].selected" @change="getNamespace">
+                :label="select[0].label" v-model="select[0].selected" @change="changeCluster">
             </v-select>
           </v-flex>
 
@@ -27,7 +27,7 @@
           <v-flex xs2>
             <v-select :items="select[1].items"
                 item-text="metadata.name" item-value="metadata.name" auto
-                :label="select[1].label" v-model="select[1].selected">
+                :label="select[1].label" v-model="select[1].selected"  @change="getResources">
             </v-select>
           </v-flex>
 
@@ -35,7 +35,7 @@
           <v-flex xs2 v-show="select[1].selected">
             <v-select :items="select[2].items"
                 item-text="text" item-value="value" auto
-                :label="select[2].label" v-model="select[2].selected" @change="getResources">
+                :label="select[2].label" v-model="select[2].selected" @input="getResources">
             </v-select>
           </v-flex>
         </v-layout>
@@ -44,7 +44,9 @@
           <v-card-title>
             Pods
             <v-spacer></v-spacer>
-            <v-text-field v-model="table.keyword" append-icon="search" label="Search" single-line hide-details></v-text-field>
+            <v-text-field v-model="table.keyword" @keyup.esc="table.keyword = undefined"
+                          hide-details clearable
+                          append-icon="search" label="Search"></v-text-field>
           </v-card-title>
 
           <v-data-table :headers="table.headers" :items="table.items" :loading="table.loading" :search="table.keyword" hide-actions class="elevation-1">
@@ -245,7 +247,7 @@ export default {
           this.select[0].items = res.data
         })
     },
-    getNamespace() {
+    changeCluster() {
       var api = '/api'
 
       this.$http
@@ -276,7 +278,11 @@ export default {
       var ns = this.select[1].selected;
       var kind = this.select[2].selected;
 
+      if(!ns || !kind)
+        return;
+
       this.table.loading = true
+      this.table.keyword = undefined
       this.$http
         .get(`${api}/${kind}/list?cs=${cs}&ns=${ns}`)
         .then((res)=>{

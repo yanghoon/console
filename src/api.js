@@ -1,5 +1,6 @@
 // express
 const express = require("express");
+const FileUpload = require('express-fileupload');
 const app = express();
 
 // websocket
@@ -10,9 +11,11 @@ const WebSocket = require('ws');
 var K8s = require('k8s')
 
 // service
+const path = require("path");
 var cluster = require('./modules/service/cluster');
 
 app.use(express.static("dist"));
+app.use(FileUpload())
 
 // file upload :: http://webframeworks.kr/tutorials/expressjs/expressjs_file_upload/
 app.get("/api/cluster/list", (req, res) => {
@@ -111,6 +114,24 @@ app.get("/api/shell/info", (req, res) => {
 
   res.send(info)
 })
+
+app.post('/api/file/upload', function(req, res) {
+  if (!req.files)
+    return res.status(400).send('No files were uploaded.');
+ 
+  // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+  console.log(req.files)
+  let file = req.files.data;
+ 
+  // Use the mv() method to place the file somewhere on your server
+  var target = path.join(cluster.getRootPath(), file.name);
+  file.mv(target, function(err) {
+    if (err)
+      return res.status(500).send(err);
+ 
+    res.send([true]);
+  });
+});
 
 app.get("/api/:resource", (req, res) => {
   var kubectl = K8s.kubectl({

@@ -12,6 +12,7 @@ module.exports = {
       var conf = yaml.safeLoad(content, {json:true});
 
       //TODO: convert .pem to base64
+      var valid = true
       if(conf && _.isArray(conf.clusters)){
       	_.map(conf.clusters, (cs) => {
       		var pem = cs.cluster['certificate-authority']
@@ -20,6 +21,12 @@ module.exports = {
 	      			pem = path.resolve(path.dirname(file), pem)
 	      		
 	      		console.log("Convert cert file to data-string(base64) -", pem)
+
+	      		if(!fs.existsSync(pem)){
+		      		console.log("There is no cert file. Skip this config.")
+		      		valid = false
+		      		return
+	      		}
 
 	      		pem = fs.readFileSync(pem)
 	      		cs.cluster['certificate-authority-data'] = Buffer.from(pem).toString('base64')
@@ -31,7 +38,7 @@ module.exports = {
       	})
       }
 
-      return conf
+      return valid ? conf : undefined
   },
   loadAll () {
 	// https://nodejs.org/api/fs.html#fs_fs_readdirsync_path_options
@@ -65,6 +72,9 @@ module.exports = {
 	})
 
 	return ret;
+  },
+  getRootPath(){
+  	return CONF_PATH	
   }
 }
 
