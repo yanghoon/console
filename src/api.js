@@ -108,6 +108,13 @@ app.ws('/api/shell', function(client, req){
     console.log('K8S-SHELL :: SEND ', chunk, msg)
     ws.send(chunk)
   })
+  client.on('close', function(code){
+    ws.close()
+    client = {
+      send () {},
+      close () {}
+    }
+  })
 })
 
 app.get("/api/shell/info", (req, res) => {

@@ -120,7 +120,8 @@
         </v-card-title>
 
         <v-card-text>
-          <ssh ref="ssh"></ssh>
+          <!-- https://kr.vuejs.org/v2/guide/components.html#%EB%8F%99%EC%A0%81-Props -->
+          <ssh ref="ssh" :cs="ssh.cs" :ns="ssh.ns" :pod="ssh.pod" :con="ssh.con"></ssh>
         </v-card-text>
 
         <v-card-actions>
@@ -183,6 +184,8 @@ function handler(comp, pods){
 import 'codemirror/theme/base16-dark.css'
 import 'codemirror/mode/yaml/yaml.js'
 
+const _ = require('underscore');
+
 export default {
   name: 'Kube',
   data () {
@@ -236,7 +239,11 @@ export default {
         }
       },
       ssh: {
-        show: false
+        show: false,
+        cs: undefined,
+        ns: undefined,
+        pod: undefined,
+        con: undefined
       }
     }
   },
@@ -298,11 +305,12 @@ export default {
       this.ssh.show = true;
       this.ssh.selected = item;
 
-      var cs = this.select[0].selected;
-      var ns = this.select[1].selected;
-      var kind = this.select[2].selected;
+      this.ssh.cs = this.select[0].selected;
+      this.ssh.ns = this.select[1].selected;
+      this.ssh.pod = item.metadata.name;
+      this.ssh.con = _.map(item.status.containerStatuses, (con) => {return con.name})[0]
 
-      //this.$refs.ssh.fit()
+      this.$refs.ssh.init()
 
       /*
       var api = '/api'

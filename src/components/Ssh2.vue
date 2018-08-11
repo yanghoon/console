@@ -35,13 +35,14 @@ Terminal.applyAddon(fit);
 
 export default {
   name: 'ssh',
+  props: ['cs', 'ns', 'pod', 'con'],
   data () {
     return {
       cmd: "",
       endpoint:'',
-      cs: 'zcp-demo',
-      ns: 'zcp-system',
-      pod: 'zcp-jenkins-7c878bd78-fs7j2',
+      //cs: 'zcp-demo',
+      //ns: 'zcp-system',
+      //pod: 'zcp-jenkins-7c878bd78-fs7j2',
       ws: undefined,
       terminal: {
         term: null,
@@ -64,16 +65,14 @@ export default {
       var api = '/api'
       var comp = this;
 
-      var cs = 'zcp-demo'
-      var ns = 'zcp-system'
-      var pod = 'zcp-jenkins-7c878bd78-fs7j2'
-      var con = 'zcp-jenkins'
+      var term = this.terminal.term
+      term.clear()
 
-      this.endpoint = `/api/v1/namespaces/${ns}/pods/${pod}`
+      this.endpoint = `/api/v1/namespaces/${this.ns}/pods/${this.pod}`
 
       // https://github.com/websockets/wscat/blob/master/bin/wscat#L248
       function exec(info){
-        var url = `ws://localhost:8080${api}/shell?cs=${cs}&ns=${ns}&pod=${pod}&con=${con}`
+        var url = `ws://localhost:8080${api}/shell?cs=${comp.cs}&ns=${comp.ns}&pod=${comp.pod}&con=${comp.con}`
         const ws = new WebSocket(url);
         comp.ws = ws
 
@@ -105,9 +104,15 @@ export default {
           exec(res.data);
         })
     },
-    fit () {
-      var term = this.terminal.term;
-      term.fit();
+    init () {
+      var term = this.terminal.term
+      term.fit()
+      term.resize()
+
+      // https://github.com/xtermjs/xterm.js/issues/943#issuecomment-327367759
+      term.write('\x1b')
+      term.write('\n\n\r')
+      term.clear()
     }
   },
   mounted () {
@@ -128,6 +133,8 @@ export default {
     //term.refresh(term.x, term.y);
     //term.showCursor();
     term.resize();
+
+    this.endpoint = `/api/v1/namespaces/${this.ns}/pods/${this.pod}`
   }
 }
 </script>
