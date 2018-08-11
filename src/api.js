@@ -11,6 +11,7 @@ const WebSocket = require('ws');
 var K8s = require('k8s')
 
 // service
+const _ = require('underscore');
 const path = require("path");
 var cluster = require('./modules/service/cluster');
 
@@ -50,49 +51,58 @@ app.get("/api/cluster/:cluster/namespace/:ns/pod/list", (req, res) => {
 
 app.ws('/api/shell', function(client, req){
   // https://stackoverflow.com/a/39233132
-  //console.log(req)
+  console.log(req.url, req.query)
 
-  var init = false;
-  function openShell(client, info){
-    var url = info.server + info.endpoint + '/exec?container=mypod&stdin=1&stdout=1&stderr=1&tty=1&command=bash';
-    var protocol = info.protocol;
-    var headers = info.headers;
-    var opts = {
-      headers: headers,
-      ca: new Buffer(info.ca, 'base64')
-    }
-
-    console.log(url)
-    console.log(protocol)
-    console.log(headers)
-    console.log(opts)
-
-    ws = new WebSocket(url, protocol, opts)
-    ws.on('open',  () => { console.log('K8S-SHELL :: Open')})
-    ws.on('error', (err) => { console.log('K8S-SHELL :: Error - ', err.message)})
-    ws.on('close', (code) => { console.log('K8S-SHELL :: Close - ', code)})
-    ws.on('ping', () => { console.log('K8S-SHELL :: Ping')})
-    ws.on('pong', () => { console.log('K8S-SHELL :: Pong')})
-    ws.on('message', (data) => {
-      // https://stackoverflow.com/a/38237610
-      var msg = Buffer.from(data.substring(1), 'base64').toString()
-      if(msg)
-        console.log("K8S-SHELL :: MESSAGE ", data, msg)
-      client.send(msg)
-    })
+  var conf = cluster.loadConf(req.query.cs, true)
+  if(!conf){
+    client.send(`There is no cluster '${cs}'`)
+    client.close()
+    return
   }
 
+  var cs = _.find(conf.clusters, (c) => {return c.name == req.query.cs}).cluster
+  var token = _.map(conf.users, (u) => {return u.user && u.user.token})[0]
+
+  //var server = cs.server.replace(/http/, 'ws') 
+  var server = cs.server
+  var protocol = 'base64.channel.k8s.io'
+  var endpoint = `/api/v1/namespaces/${req.query.ns}/pods/${req.query.pod}`
+
+  var url = server + endpoint + `/exec?container=${req.query.con}&stdin=1&stdout=1&stderr=1&tty=1&command=bash`;
+  var opts = {
+    headers: {Authorization: `Bearer ${token}`},
+    ca: new Buffer(cs['certificate-authority-data'], 'base64')
+  }
+
+  console.log(url)
+  console.log(protocol)
+  console.log(opts)
+
+  // connect to pod
+  var ws = new WebSocket(url, protocol, opts)
+  ws.on('open',  () => { console.log('K8S-SHELL :: Open')})
+  ws.on('error', (err) => {
+    console.log('K8S-SHELL :: Error - ', err)
+    client.send(err.message)
+    client.close()
+  })
+  ws.on('close', (code) => {
+    console.log('K8S-SHELL :: Close - ', code)
+    client.send(code)
+    client.close()
+  })
+  ws.on('message', (data) => {
+    // https://stackoverflow.com/a/38237610
+    var msg = Buffer.from(data.substring(1), 'base64').toString()
+    if(msg)
+      console.log("K8S-SHELL :: MESSAGE ", data, msg)
+    client.send(msg)
+  })
+  //ws.on('ping', () => { console.log('K8S-SHELL :: Ping')})
+  //ws.on('pong', () => { console.log('K8S-SHELL :: Pong')})
+
+  // relay to clinet
   client.on('message', function(msg){
-    //console.log(msg);
-
-    if(!init){
-      init = true;
-      client.send('Try to connect the pod.\r\n') 
-
-      openShell(client, JSON.parse(msg))
-      return;
-    }
-
     // https://stackoverflow.com/a/38237610
     var chunk = '0' + Buffer.from(msg + '\n').toString('base64')
     console.log('K8S-SHELL :: SEND ', chunk, msg)

@@ -58,7 +58,7 @@ export default {
       this.cmd = ""
     },
     disconnect () {
-      alert('Not implement')
+      this.ws.close()
     },
     connect () {
       var api = '/api'
@@ -67,12 +67,13 @@ export default {
       var cs = 'zcp-demo'
       var ns = 'zcp-system'
       var pod = 'zcp-jenkins-7c878bd78-fs7j2'
+      var con = 'zcp-jenkins'
 
       this.endpoint = `/api/v1/namespaces/${ns}/pods/${pod}`
 
       // https://github.com/websockets/wscat/blob/master/bin/wscat#L248
       function exec(info){
-        var url = `ws://localhost:8080${api}/shell?cs=${cs}&ns=${ns}&pod=${pod}`
+        var url = `ws://localhost:8080${api}/shell?cs=${cs}&ns=${ns}&pod=${pod}&con=${con}`
         const ws = new WebSocket(url);
         comp.ws = ws
 
@@ -82,8 +83,9 @@ export default {
           //info.endpoint = comp.endpoint
           //ws.send(JSON.stringify(info))
         }
-        ws.onclose = (code) => {
-          console.log('close :: ', code)
+        ws.onclose = (ev) => {
+          console.log('close :: ', ev.code)
+          comp.ws = undefined
         }
         ws.onerror = (err) => {
           console.log('error :: ', err)
@@ -122,7 +124,7 @@ export default {
 
     var term = this.terminal.term;
     term.open(terminalContainer);
-    //term.fit();
+    term.fit();
     //term.refresh(term.x, term.y);
     //term.showCursor();
     term.resize();

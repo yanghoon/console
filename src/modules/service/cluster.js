@@ -58,9 +58,9 @@ module.exports = {
   clusterNames () {
 	return _.map(this.loadAll(), (conf) => { return {name: conf.clusters[0].name}; })
   },
-  loadConf (clusterName) {
+  loadConf (clusterName, json) {
 	var conf = _.find(this.loadAll(), (conf) => { return conf.clusters[0].name == clusterName; })
-	return yaml.safeDump(conf)
+	return json ? conf : yaml.safeDump(conf)
   },
   getPath (clusterName) {
 	var ret = undefined;
