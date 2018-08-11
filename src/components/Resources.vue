@@ -70,7 +70,8 @@
                 </v-tooltip>
 
                 <v-tooltip right :open-delay="0" :close-delay="0">
-                  <v-btn slot="activator" color="primary" flat icon disabled>
+                  <v-btn slot="activator" color="primary" flat icon
+                         @click.native="showSsh(props.item)">
                     <v-icon>web_asset</v-icon>
                   </v-btn>
                   <span>Open Shell</span>
@@ -108,6 +109,24 @@
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" flat @click.native="editor.show = false" disabled>Save</v-btn>
           <v-btn color="blue darken-1" flat @click.native="editor.show = false">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="ssh.show" max-width="1000">
+      <v-card>
+        <v-card-title class="headline grey lighten-2" primary-title>
+          {{ ssh.selected && ssh.selected.metadata.name }}
+        </v-card-title>
+
+        <v-card-text>
+          <ssh ref="ssh"></ssh>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" flat @click.native="ssh.show = false" disabled>Save</v-btn>
+          <v-btn color="blue darken-1" flat @click.native="ssh.show = false">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -215,6 +234,9 @@ export default {
           lineNumbers: true,
           line: true
         }
+      },
+      ssh: {
+        show: false
       }
     }
   },
@@ -271,6 +293,26 @@ export default {
           console.log(res)
           this.editor.code = res.data
         })
+    },
+    showSsh (item) {
+      this.ssh.show = true;
+      this.ssh.selected = item;
+
+      var cs = this.select[0].selected;
+      var ns = this.select[1].selected;
+      var kind = this.select[2].selected;
+
+      //this.$refs.ssh.fit()
+
+      /*
+      var api = '/api'
+      this.$http
+        .get(`${api}/${kind}/${item.metadata.name}?type=yaml&cs=${cs}&ns=${ns}`)
+        .then((res)=>{
+          console.log(res)
+          this.editor.code = res.data
+        })
+      */
     },
     getResources () {
       var api = '/api'

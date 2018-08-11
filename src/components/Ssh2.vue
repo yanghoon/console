@@ -1,37 +1,25 @@
 <template>
-  <!--
-  Layout Configure
-  - https://vuetifyjs.com/ko/layout/pre-defined#default-markup
-  - https://vuetifyjs.com/ko/layout/grid#example-playground
-  -->
-  <v-container fluid>
-    <v-layout row wrap align-center justify-center>
-      <v-flex xs11>
+  <div>
+    <form>
+      <v-text-field v-model="endpoint" label="Pod Endpoint" readonly></v-text-field>
 
-        <form>
-          <v-text-field v-model="endpoint" label="Pod Endpoint" required></v-text-field>
+      <v-btn color="primary" @click.native="connect()" v-bind:disabled="!!ws">
+        <v-icon left>desktop_windows</v-icon> Connect
+      </v-btn>
+      <v-btn color="primary" @click.native="disconnect()" :disabled="!ws">
+        <v-icon left>desktop_windows</v-icon> Disconnect
+      </v-btn>
 
-          <v-btn color="primary" @click.native="connect()" :disabled="ws">
-            <v-icon left>desktop_windows</v-icon> Connect
-          </v-btn>
-          <v-btn color="primary" @click.native="disconnect()" :disabled="!ws">
-            <v-icon left>desktop_windows</v-icon> Disconnect
-          </v-btn>
-        </form>
+      <v-text-field
+        v-model="cmd" @keyup.enter="exec()"
+        label="Command" :placeholder="ws ? 'Type command and press enter' : 'No connection'"
+        :disabled="!ws"
+        required ></v-text-field>
+    </form>
+    
+      <div class="console"></div>
 
-        <form>
-          <v-text-field
-            v-model="cmd" @keyup.enter="exec()"
-            label="Command" :placeholder="ws ? 'Type command and press enter' : 'No connection'"
-            :disabled="!ws"
-            required ></v-text-field>
-        </form>
-
-        <div class="console"></div>
-
-      </v-flex>
-    </v-layout>
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -46,11 +34,14 @@ import * as fit from 'xterm/lib/addons/fit/fit';
 Terminal.applyAddon(fit);
 
 export default {
-  name: 'Ssh',
+  name: 'ssh',
   data () {
     return {
-      endpoint:'/api/v1/namespaces/default/pods/mypod',
       cmd: "",
+      endpoint:'',
+      cs: 'zcp-demo',
+      ns: 'zcp-system',
+      pod: 'zcp-jenkins-7c878bd78-fs7j2',
       ws: undefined,
       terminal: {
         term: null,
@@ -73,17 +64,23 @@ export default {
       var api = '/api'
       var comp = this;
 
+      var cs = 'zcp-demo'
+      var ns = 'zcp-system'
+      var pod = 'zcp-jenkins-7c878bd78-fs7j2'
+
+      this.endpoint = `/api/v1/namespaces/${ns}/pods/${pod}`
+
       // https://github.com/websockets/wscat/blob/master/bin/wscat#L248
       function exec(info){
-        var url = `ws://localhost:8080${api}/shell`
+        var url = `ws://localhost:8080${api}/shell?cs=${cs}&ns=${ns}&pod=${pod}`
         const ws = new WebSocket(url);
         comp.ws = ws
 
         ws.onopen = () => {
           console.log('open')
 
-          info.endpoint = comp.endpoint
-          ws.send(JSON.stringify(info))
+          //info.endpoint = comp.endpoint
+          //ws.send(JSON.stringify(info))
         }
         ws.onclose = (code) => {
           console.log('close :: ', code)
@@ -98,11 +95,17 @@ export default {
         }
       }
 
+      exec(); return;
+
       this.$http
         .get(`${api}/shell/info`)
         .then((res)=>{
           exec(res.data);
         })
+    },
+    fit () {
+      var term = this.terminal.term;
+      term.fit();
     }
   },
   mounted () {
@@ -112,14 +115,14 @@ export default {
       cursorBlink: true,
       //cols: this.terminal.cols,
       //rows: this.terminal.rows
-      rows: 25,
+      rows: 20,
       cols: 80,
       screenKeys: true
     })
 
     var term = this.terminal.term;
     term.open(terminalContainer);
-    term.fit();
+    //term.fit();
     //term.refresh(term.x, term.y);
     //term.showCursor();
     term.resize();
@@ -129,6 +132,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-.vue-codemirror { text-align: left!important; }
-.CodeMirror-hints { z-index: 203 !important; }
 </style>
