@@ -106,8 +106,6 @@ export default {
     },
     init () {
       var term = this.terminal.term
-      term.fit()
-      term.resize()
 
       // https://github.com/xtermjs/xterm.js/issues/943#issuecomment-327367759
       term.write('\x1b')
@@ -122,19 +120,32 @@ export default {
       cursorBlink: true,
       //cols: this.terminal.cols,
       //rows: this.terminal.rows
-      rows: 20,
+      rows: 25,
       cols: 80,
       screenKeys: true
     })
 
     var term = this.terminal.term;
     term.open(terminalContainer);
-    term.fit();
+    //term.fit();
     //term.refresh(term.x, term.y);
     //term.showCursor();
     term.resize();
+    this.$nextTick(() => {
+      console.log('mounted!!')
+      term.resize()
+      term.fit()
+    })
 
     this.endpoint = `/api/v1/namespaces/${this.ns}/pods/${this.pod}`
+  },
+  updated () {
+    this.$nextTick(() => {
+      console.log('updated!!')
+      var term = this.terminal.term;
+      term.resize()
+      term.fit()
+    })
   }
 }
 </script>

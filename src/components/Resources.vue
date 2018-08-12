@@ -113,7 +113,7 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="ssh.show" max-width="1000">
+    <v-dialog v-model="ssh.show" max-width="1000" lazy>
       <v-card>
         <v-card-title class="headline grey lighten-2" primary-title>
           {{ ssh.selected && ssh.selected.metadata.name }}
@@ -309,8 +309,6 @@ export default {
       this.ssh.ns = this.select[1].selected;
       this.ssh.pod = item.metadata.name;
       this.ssh.con = _.map(item.status.containerStatuses, (con) => {return con.name})[0]
-
-      this.$refs.ssh.init()
 
       /*
       var api = '/api'
