@@ -66,13 +66,11 @@ export default {
       var term = this.terminal.term
 
       // https://github.com/xtermjs/xterm.js/issues/943#issuecomment-327367759
-      //term.write('\x1b')
-      //term.write('\n\n\r')
       term.reset()
-      term.fit()
 
       // https://github.com/websockets/wscat/blob/master/bin/wscat#L248
-      var url = `ws://localhost:8080${api}/shell?cs=${this.cs}&ns=${this.ns}&pod=${this.pod}&con=${this.con}`
+      var server = location.protocol.replace('http', 'ws') + '//' + location.host
+      var url = `${server}${api}/shell?cs=${this.cs}&ns=${this.ns}&pod=${this.pod}&con=${this.con}`
       const ws = new WebSocket(url);
       this.ws = ws
 
