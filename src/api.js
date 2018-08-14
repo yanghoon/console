@@ -67,8 +67,9 @@ app.ws('/api/shell', function(client, req){
   var server = cs.server
   var protocol = 'base64.channel.k8s.io'
   var endpoint = `/api/v1/namespaces/${req.query.ns}/pods/${req.query.pod}`
+  var shell = req.query.shell
 
-  var url = server + endpoint + `/exec?container=${req.query.con}&stdin=1&stdout=1&stderr=1&tty=1&command=bash`;
+  var url = server + endpoint + `/exec?container=${req.query.con}&stdin=1&stdout=1&stderr=1&tty=1&command=${shell}`;
   var opts = {
     headers: {Authorization: `Bearer ${token}`},
     ca: new Buffer(cs['certificate-authority-data'], 'base64')
@@ -94,8 +95,8 @@ app.ws('/api/shell', function(client, req){
   ws.on('message', (data) => {
     // https://stackoverflow.com/a/38237610
     var msg = Buffer.from(data.substring(1), 'base64').toString()
-    if(msg)
-      console.log("K8S-SHELL :: MESSAGE ", data, msg)
+    //if(msg)
+      console.log("K8S-SHELL :: MESSAGE ", data, es(msg))
     client.send(msg)
   })
   //ws.on('ping', () => { console.log('K8S-SHELL :: Ping')})
@@ -105,7 +106,7 @@ app.ws('/api/shell', function(client, req){
   client.on('message', function(msg){
     // https://stackoverflow.com/a/38237610
     var chunk = '0' + Buffer.from(msg + '\n').toString('base64')
-    console.log('K8S-SHELL :: SEND ', chunk, msg)
+    console.log('K8S-SHELL :: SEND ', chunk, es(msg))
     ws.send(chunk)
   })
   client.on('close', function(code){
@@ -117,6 +118,25 @@ app.ws('/api/shell', function(client, req){
   })
 })
 
+function es(str){
+  // https://ko.wikipedia.org/wiki/%EC%A0%9C%EC%96%B4_%EB%AC%B8%EC%9E%90
+  var arr = []
+  for(var i=0; i<str.length; i++){
+    var c = str.charCodeAt(i)
+    switch(c){
+    case 9:  arr.push(' HT'); break;
+    case 10: arr.push(' LF\n'); break;
+    case 12: arr.push(' FF'); break;
+    case 13: arr.push(' CR'); break;
+    default:
+      arr.push(str.charAt(i))
+    }
+  }
+
+  return arr.join('')
+}
+
+/*
 app.get("/api/shell/info", (req, res) => {
   var info = {
     server: 'wss://192.168.99.100:8443',
@@ -131,6 +151,7 @@ app.get("/api/shell/info", (req, res) => {
 
   res.send(info)
 })
+*/
 
 app.post('/api/file/upload', function(req, res) {
   if (!req.files)

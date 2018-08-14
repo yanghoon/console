@@ -223,7 +223,7 @@ export default {
         headers: expandFields(),
         items: [],
         loading: false,
-        keyword: ""
+        keyword: "jen"
       },
       editor: {
         show: false,

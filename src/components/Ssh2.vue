@@ -3,18 +3,26 @@
     <form>
       <v-text-field v-model="endpoint" label="Pod Endpoint" readonly></v-text-field>
 
-      <v-btn color="primary" @click.native="connect()" :disabled="!!ws">
-        <v-icon left>desktop_windows</v-icon> Connect
-      </v-btn>
-      <v-btn color="primary" @click.native="disconnect()" :disabled="!ws">
-        <v-icon left>desktop_windows</v-icon> Disconnect
-      </v-btn>
+      <v-layout row wrap align-center justify-start>
+        <v-flex xs2>
+          <v-select :items="shell.items" auto v-model="shell.selected"></v-select>
+        </v-flex>
 
+        <v-btn color="primary" @click.native="connect()" :disabled="!!ws">
+          <v-icon left>desktop_windows</v-icon> Connect
+        </v-btn>
+        <v-btn color="primary" @click.native="disconnect()" :disabled="!ws">
+          <v-icon left>desktop_windows</v-icon> Disconnect
+        </v-btn>
+      </v-layout>
+
+      <!--
       <v-text-field
         v-model="cmd" @keyup.enter="exec()"
         label="Command" :placeholder="ws ? 'Type command and press enter' : 'No connection'"
         :disabled="!ws"
         required ></v-text-field>
+      -->
     </form>
     
     <div class="console"></div>
@@ -38,11 +46,15 @@ var term_char_height = -1;
 
 export default {
   name: 'ssh',
-  props: ['cs', 'ns', 'pod', 'con', 'visible'],
+  props: ['cs', 'ns', 'pod', 'con'],
   data () {
     return {
       cmd: "",
       endpoint:'',
+      shell: {
+        selected: 'bash',
+        items: ['bash', 'sh']
+      },
       ws: undefined,
       terminal: {
         term: null,
@@ -70,12 +82,57 @@ export default {
 
       // https://github.com/websockets/wscat/blob/master/bin/wscat#L248
       var server = location.protocol.replace('http', 'ws') + '//' + location.host
-      var url = `${server}${api}/shell?cs=${this.cs}&ns=${this.ns}&pod=${this.pod}&con=${this.con}`
+      var url = `${server}${api}/shell?cs=${this.cs}&ns=${this.ns}&pod=${this.pod}&con=${this.con}&shell=${this.shell.selected}`
       const ws = new WebSocket(url);
       this.ws = ws
 
+      let buf = [];
+      var printBuf = false;
       ws.onopen = () => {
         console.log('open')
+
+        term.on('data', (data, i, j, k) => {})
+        term.on('key', (k, e) => {
+          var printable = (
+            !e.altKey && !e.altGraphKey && !e.ctrlKey && !e.metaKey
+            && e.keyCode < 128
+          );
+
+          if(e.keyCode == 13) {
+            // Enter
+            for(var i=0; i<buf.length; i++)
+              term.write('\b \b')
+
+            var cmd = buf.join('')
+            buf.length = 0
+            ws.send(cmd)
+          } else if(e.keyCode == 8) {
+            // Backspace
+            if (buf.length) {
+              term.write('\b \b')
+              buf.length = Math.max(0, buf.length -1)
+            }
+          } else if(e.keyCode == 9) {
+            for(var i=0; i<buf.length; i++)
+              term.write('\b \b')
+
+            ws.send(buf.join('') + '\t')
+            term._core.eraseLine(1)
+          } else if(e.keyCode == 38) {
+            ws.send(k)
+          } else if(printable){
+            buf.push(k)            
+            term.write(k)
+          }
+
+          console.log("term.key :: '%s'(%d), '%s'", k, e.keyCode, buf.join(''))
+        })
+
+        /*
+        term.on('paste', (data, e) => {
+          term.write(data)
+        })
+        */
       }
       ws.onclose = (ev) => {
         console.log('close :: ', ev.code)
@@ -86,8 +143,16 @@ export default {
       }
       ws.onmessage = (msg) => {
         //console.log('message', data)
-        console.log("< ", msg.data)
+        //console.log("< ", msg.data)
+        /*
+        if(printBuf){
+          printBuf = false
+          msg.data += buf.join('')
+        }
+        */
         this.terminal.term.write(msg.data)
+        if(msg.data.endsWith('\r\n'))
+          term.write(buf.join(''))
       }
     },
     resize () {
@@ -146,6 +211,7 @@ export default {
     })
 
     term.open(terminalContainer);
+    term.fit()
 
     this.endpoint = `/api/v1/namespaces/${this.ns}/pods/${this.pod}`
     this.terminal.term = term;
@@ -153,6 +219,9 @@ export default {
   },
   updated () {
     this.$nextTick(this.resize)
+  },
+  beforeDestroy () {
+    this.disconnect()
   }
 }
 </script>
