@@ -3,7 +3,7 @@
     <form>
       <v-text-field v-model="endpoint" label="Pod Endpoint" readonly></v-text-field>
 
-      <v-btn color="primary" @click.native="connect()" v-bind:disabled="!!ws">
+      <v-btn color="primary" @click.native="connect()" :disabled="!!ws">
         <v-icon left>desktop_windows</v-icon> Connect
       </v-btn>
       <v-btn color="primary" @click.native="disconnect()" :disabled="!ws">
@@ -17,7 +17,7 @@
         required ></v-text-field>
     </form>
     
-      <div class="console"></div>
+    <div class="console"></div>
 
   </div>
 </template>
@@ -33,16 +33,16 @@ import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
 Terminal.applyAddon(fit);
 
+// variable not in vue
+var term_char_height = -1;
+
 export default {
   name: 'ssh',
-  props: ['cs', 'ns', 'pod', 'con'],
+  props: ['cs', 'ns', 'pod', 'con', 'visible'],
   data () {
     return {
       cmd: "",
       endpoint:'',
-      //cs: 'zcp-demo',
-      //ns: 'zcp-system',
-      //pod: 'zcp-jenkins-7c878bd78-fs7j2',
       ws: undefined,
       terminal: {
         term: null,
@@ -63,93 +63,102 @@ export default {
     },
     connect () {
       var api = '/api'
-      var comp = this;
-
-      var term = this.terminal.term
-      term.clear()
-
-      this.endpoint = `/api/v1/namespaces/${this.ns}/pods/${this.pod}`
-
-      // https://github.com/websockets/wscat/blob/master/bin/wscat#L248
-      function exec(info){
-        var url = `ws://localhost:8080${api}/shell?cs=${comp.cs}&ns=${comp.ns}&pod=${comp.pod}&con=${comp.con}`
-        const ws = new WebSocket(url);
-        comp.ws = ws
-
-        ws.onopen = () => {
-          console.log('open')
-
-          //info.endpoint = comp.endpoint
-          //ws.send(JSON.stringify(info))
-        }
-        ws.onclose = (ev) => {
-          console.log('close :: ', ev.code)
-          comp.ws = undefined
-        }
-        ws.onerror = (err) => {
-          console.log('error :: ', err)
-        }
-        ws.onmessage = (msg) => {
-          //console.log('message', data)
-          console.log("< ", msg.data)
-          comp.terminal.term.write(msg.data)
-        }
-      }
-
-      exec(); return;
-
-      this.$http
-        .get(`${api}/shell/info`)
-        .then((res)=>{
-          exec(res.data);
-        })
-    },
-    init () {
       var term = this.terminal.term
 
       // https://github.com/xtermjs/xterm.js/issues/943#issuecomment-327367759
-      term.write('\x1b')
-      term.write('\n\n\r')
-      term.clear()
+      //term.write('\x1b')
+      //term.write('\n\n\r')
+      term.reset()
+      term.fit()
+
+      // https://github.com/websockets/wscat/blob/master/bin/wscat#L248
+      var url = `ws://localhost:8080${api}/shell?cs=${this.cs}&ns=${this.ns}&pod=${this.pod}&con=${this.con}`
+      const ws = new WebSocket(url);
+      this.ws = ws
+
+      ws.onopen = () => {
+        console.log('open')
+      }
+      ws.onclose = (ev) => {
+        console.log('close :: ', ev.code)
+        this.ws = undefined
+      }
+      ws.onerror = (err) => {
+        console.log('error :: ', err)
+      }
+      ws.onmessage = (msg) => {
+        //console.log('message', data)
+        console.log("< ", msg.data)
+        this.terminal.term.write(msg.data)
+      }
+    },
+    resize () {
+      /*
+       * Detect change of font size.
+       * Tracking height of the single charactor span.
+       * And re-measure before to calcuate new fit size.
+       */
+      var m = document.getElementsByClassName('xterm-char-measure-element')[0]
+      if(!m){
+        console.log('!!! mesaure not mounted.')
+        return;
+      }
+
+      var _old = term_char_height
+      var _new = m.getBoundingClientRect().height
+      if(_old == _new)
+        return
+
+      console.log('term :: size of character is changed. [old=', _old, ', new=', _new, ']')
+
+      var term = this.terminal.term
+      if(!term){
+        console.log('term :: terminal is not mounted. skip to re-measure.')
+        return
+      }
+
+      // See also
+      // - xterm/lib/addons/fit/fit.js
+      //     proposeGeometry()
+      //       term._core.renderer.dimensions.actualCellWidth
+      // - xterm/lib/render/render.js
+      //     Renderer.prototype._updateDimensions()
+      //       charMeasure.width -> scaledCharWidth -> scaledCellHeight -> scaledCanvasHeight
+      // - xterm/lib/ui/CharMeasure.js 
+      //     CharMeasure.prototype.measure()
+      //       this._measureElement.getBoundingClientRect()
+      //       _measureElement.classList.add('xterm-char-measure-element')
+      console.log('term :: do resize terminal.')
+      term._core.charMeasure.measure(term._core.options)
+      term.fit()
+
+      term_char_height = _new
     }
   },
   mounted () {
     // https://github.com/xtermjs/xterm.js/issues/573
     let terminalContainer = document.getElementsByClassName('console')[0]
-    this.terminal.term = new Terminal({
+    let term = new Terminal({
       cursorBlink: true,
       //cols: this.terminal.cols,
       //rows: this.terminal.rows
-      rows: 25,
-      cols: 80,
-      screenKeys: true
+      //rows: 24,
+      //cols: 80,
+      screenKeys: true,
     })
 
-    var term = this.terminal.term;
     term.open(terminalContainer);
-    //term.fit();
-    //term.refresh(term.x, term.y);
-    //term.showCursor();
-    term.resize();
-    this.$nextTick(() => {
-      console.log('mounted!!')
-      term.resize()
-      term.fit()
-    })
 
     this.endpoint = `/api/v1/namespaces/${this.ns}/pods/${this.pod}`
+    this.terminal.term = term;
+    this.$nextTick(this.resize)
   },
   updated () {
-    this.$nextTick(() => {
-      console.log('updated!!')
-      var term = this.terminal.term;
-      term.resize()
-      term.fit()
-    })
+    this.$nextTick(this.resize)
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style scoped>
 </style>

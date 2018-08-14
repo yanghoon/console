@@ -8,8 +8,6 @@ import Ssh from '@/components/Ssh'
 
 Vue.use(Router)
 
-console.log(Vue.options.components)
-
 export default new Router({
   routes: [
     {

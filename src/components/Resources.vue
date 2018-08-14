@@ -121,7 +121,7 @@
 
         <v-card-text>
           <!-- https://kr.vuejs.org/v2/guide/components.html#%EB%8F%99%EC%A0%81-Props -->
-          <ssh ref="ssh" :cs="ssh.cs" :ns="ssh.ns" :pod="ssh.pod" :con="ssh.con"></ssh>
+          <ssh ref="ssh" :cs="ssh.cs" :ns="ssh.ns" :pod="ssh.pod" :con="ssh.con" :visible="ssh.show"></ssh>
         </v-card-text>
 
         <v-card-actions>
@@ -194,12 +194,12 @@ export default {
       select: [
         {
           label: 'Cluster',
-          selected: undefined,
+          selected: 'zcp-demo',
           items: []
         },
         {
           label: 'Namespace',
-          selected: undefined,
+          selected: 'zcp-system',
           items: []
         },
         {
@@ -211,7 +211,7 @@ export default {
             {text:"Pod", value:"pod"},
             {text:"Service", value:"svc"},
             {text:"Ingress", value:"ing"},
-            //{text:"ConfigMap", value:"cm"},
+            {text:"ConfigMap", value:"cm"},
             {text:"Secret", value:"secrets"},
             {text:"PersistentVolume", value:"pv"},
             {text:"PersistentVolumeClaim", value:"pvc"},
@@ -249,7 +249,9 @@ export default {
   },
   mounted() {
     this.getCluster()
-    //this.getPod()
+    if(this.select[0].selected){
+      this.changeCluster()
+    }
   },
   methods: {
     getPod () {

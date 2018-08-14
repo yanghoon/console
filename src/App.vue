@@ -52,7 +52,6 @@
 </template>
 
 <script>
-console.log(this)
 export default {
   data () {
     return {
