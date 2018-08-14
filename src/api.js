@@ -113,7 +113,9 @@ app.ws('/api/shell', function(client, req){
     //https://github.com/kubernetes/kubernetes/blob/1400c2638614197915ffa16475f7b48afb0fc0b3/pkg/kubelet/server.go#L478
     //https://github.com/kubernetes/kubernetes/blob/1400c2638614197915ffa16475f7b48afb0fc0b3/pkg/util/wsstream/wsstream.go#L112
     //https://github.com/kubernetes/kubernetes/blob/714f97d7baf4975ad3aa47735a868a81a984d1f0/staging/src/k8s.io/apiserver/pkg/util/wsstream/conn.go#L41
+    
     //http://tldp.org/LDP/abs/html/tabexpansion.html
+    //https://iridakos.com/tutorials/2018/03/01/bash-programmable-completion-tutorial.html
   })
   client.on('close', function(code){
     ws.close()
