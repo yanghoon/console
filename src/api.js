@@ -105,7 +105,7 @@ app.ws('/api/shell', function(client, req){
   // relay to clinet
   client.on('message', function(msg){
     // https://stackoverflow.com/a/38237610
-    var chunk = '0' + Buffer.from(msg + '\n').toString('base64')
+    var chunk = '0' + Buffer.from(msg).toString('base64')
     console.log('K8S-SHELL :: SEND ', chunk, es(msg))
     ws.send(chunk)
   })

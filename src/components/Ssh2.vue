@@ -91,13 +91,22 @@ export default {
       ws.onopen = () => {
         console.log('open')
 
-        term.on('data', (data, i, j, k) => {})
+        term.on('data', (data) => {
+          ws.send(data)
+        })
         term.on('key', (k, e) => {
           var printable = (
             !e.altKey && !e.altGraphKey && !e.ctrlKey && !e.metaKey
             && e.keyCode < 128
           );
 
+          return
+          
+          if(printable){
+            ws.send(k)
+          }
+
+          /*
           if(e.keyCode == 13) {
             // Enter
             for(var i=0; i<buf.length; i++)
@@ -105,7 +114,7 @@ export default {
 
             var cmd = buf.join('')
             buf.length = 0
-            ws.send(cmd)
+            ws.send(cmd + '\n')
           } else if(e.keyCode == 8) {
             // Backspace
             if (buf.length) {
@@ -126,6 +135,7 @@ export default {
           }
 
           console.log("term.key :: '%s'(%d), '%s'", k, e.keyCode, buf.join(''))
+          */
         })
 
         /*
