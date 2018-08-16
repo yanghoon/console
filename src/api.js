@@ -89,7 +89,10 @@ app.ws('/api/shell', function(client, req){
   })
   ws.on('close', (code) => {
     console.log('K8S-SHELL :: Close - ', code)
-    client.send(code)
+
+    if(client.readyState === WebSocket.OPEN)
+      client.send(code)
+    
     client.close()
   })
   ws.on('message', (data) => {

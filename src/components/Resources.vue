@@ -121,7 +121,7 @@
 
         <v-card-text>
           <!-- https://kr.vuejs.org/v2/guide/components.html#%EB%8F%99%EC%A0%81-Props -->
-          <ssh ref="ssh" :cs="ssh.cs" :ns="ssh.ns" :pod="ssh.pod" :con="ssh.con" :visible="ssh.show"></ssh>
+          <ssh ref="ssh" :info="ssh"></ssh>
         </v-card-text>
 
         <v-card-actions>
@@ -223,7 +223,7 @@ export default {
         headers: expandFields(),
         items: [],
         loading: false,
-        keyword: "jen"
+        keyword: ""
       },
       editor: {
         show: false,
@@ -243,7 +243,7 @@ export default {
         cs: undefined,
         ns: undefined,
         pod: undefined,
-        con: undefined
+        con: {}
       }
     }
   },
@@ -310,7 +310,7 @@ export default {
       this.ssh.cs = this.select[0].selected;
       this.ssh.ns = this.select[1].selected;
       this.ssh.pod = item.metadata.name;
-      this.ssh.con = _.map(item.status.containerStatuses, (con) => {return con.name})[0]
+      this.ssh.con.items = _.map(item.spec.containers, (con) => {return con.name})
 
       /*
       var api = '/api'

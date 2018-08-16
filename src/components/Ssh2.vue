@@ -4,9 +4,11 @@
       <v-text-field v-model="endpoint" label="Pod Endpoint" readonly></v-text-field>
 
       <v-layout row wrap align-center justify-start>
-        <v-flex xs2>
-          <v-select :items="shell.items" auto v-model="shell.selected"></v-select>
-        </v-flex>
+        <v-select :items="con.items" v-model="con.selected" label="Container" auto></v-select>
+        <div class="text-md-center"> <span>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</span> </div>
+        <v-select :items="shell.items" v-model="shell.selected" label="Shell" auto></v-select>
+
+        <v-spacer></v-spacer>
 
         <v-btn color="primary" @click.native="connect()" :disabled="!!ws">
           <v-icon left>desktop_windows</v-icon> Connect
@@ -46,11 +48,23 @@ var term_char_height = -1;
 
 export default {
   name: 'ssh',
-  props: ['cs', 'ns', 'pod', 'con'],
+  props: ['info'],
+  watch: {
+    info: {
+      handler(_new, _old){
+        console.log('WATCH !!')
+        this.bindProps(_new)
+      },
+      deep:true
+    }
+  },
   data () {
     return {
-      cmd: "",
       endpoint:'',
+      cs: undefined,
+      ns: undefined,
+      pod: undefined,
+      con: {},
       shell: {
         selected: 'bash',
         items: ['bash', 'sh']
@@ -63,15 +77,16 @@ export default {
     }
   },
   methods: {
-    exec () {
-      if(!this.ws)
-        return;
-
-      this.ws.send(this.cmd)
-      this.cmd = ""
+    bindProps (_new) {
+      this.cs = _new.cs
+      this.ns = _new.ns
+      this.pod = _new.pod
+      this.con.items = _new.con.items
+      this.con.selected = _new.con.items[0]
+      this.endpoint = `/api/v1/namespaces/${this.ns}/pods/${this.pod}`
     },
     disconnect () {
-      this.ws.close()
+      this.ws && this.ws.close()
     },
     connect () {
       var api = '/api'
@@ -82,67 +97,12 @@ export default {
 
       // https://github.com/websockets/wscat/blob/master/bin/wscat#L248
       var server = location.protocol.replace('http', 'ws') + '//' + location.host
-      var url = `${server}${api}/shell?cs=${this.cs}&ns=${this.ns}&pod=${this.pod}&con=${this.con}&shell=${this.shell.selected}`
+      var url = `${server}${api}/shell?cs=${this.cs}&ns=${this.ns}&pod=${this.pod}&con=${this.con.selected}&shell=${this.shell.selected}`
       const ws = new WebSocket(url);
       this.ws = ws
 
-      let buf = [];
-      var printBuf = false;
       ws.onopen = () => {
         console.log('open')
-
-        term.on('data', (data) => {
-          ws.send(data)
-        })
-        term.on('key', (k, e) => {
-          var printable = (
-            !e.altKey && !e.altGraphKey && !e.ctrlKey && !e.metaKey
-            && e.keyCode < 128
-          );
-
-          return
-          
-          if(printable){
-            ws.send(k)
-          }
-
-          /*
-          if(e.keyCode == 13) {
-            // Enter
-            for(var i=0; i<buf.length; i++)
-              term.write('\b \b')
-
-            var cmd = buf.join('')
-            buf.length = 0
-            ws.send(cmd + '\n')
-          } else if(e.keyCode == 8) {
-            // Backspace
-            if (buf.length) {
-              term.write('\b \b')
-              buf.length = Math.max(0, buf.length -1)
-            }
-          } else if(e.keyCode == 9) {
-            for(var i=0; i<buf.length; i++)
-              term.write('\b \b')
-
-            ws.send(buf.join('') + '\t')
-            term._core.eraseLine(1)
-          } else if(e.keyCode == 38) {
-            ws.send(k)
-          } else if(printable){
-            buf.push(k)            
-            term.write(k)
-          }
-
-          console.log("term.key :: '%s'(%d), '%s'", k, e.keyCode, buf.join(''))
-          */
-        })
-
-        /*
-        term.on('paste', (data, e) => {
-          term.write(data)
-        })
-        */
       }
       ws.onclose = (ev) => {
         console.log('close :: ', ev.code)
@@ -152,17 +112,7 @@ export default {
         console.log('error :: ', err)
       }
       ws.onmessage = (msg) => {
-        //console.log('message', data)
-        //console.log("< ", msg.data)
-        /*
-        if(printBuf){
-          printBuf = false
-          msg.data += buf.join('')
-        }
-        */
         this.terminal.term.write(msg.data)
-        if(msg.data.endsWith('\r\n'))
-          term.write(buf.join(''))
       }
     },
     resize () {
@@ -223,7 +173,23 @@ export default {
     term.open(terminalContainer);
     term.fit()
 
-    this.endpoint = `/api/v1/namespaces/${this.ns}/pods/${this.pod}`
+    term.on('data', (data) => {
+      this.ws && this.ws.send(data)
+    })
+    term.on('key', (k, e) => {
+      var printable = (
+        !e.altKey && !e.altGraphKey && !e.ctrlKey && !e.metaKey
+        && e.keyCode < 128
+      );
+
+      return
+
+      if(printable){
+        this.ws && this.ws.send(k)
+      }
+    })
+
+    this.bindProps(this.info)
     this.terminal.term = term;
     this.$nextTick(this.resize)
   },
