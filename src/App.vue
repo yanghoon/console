@@ -6,7 +6,6 @@
   - https://material.io/tools/icons/?icon=desktop_access_disabled&style=baseline
   -->
   <v-app class="grey lighten-4">
-    <div class="toolbar-band blue darken-1"></div>
 
     <v-navigation-drawer v-model="drawer" fixed clipped class="grey lighten-4" app>
 
@@ -26,7 +25,8 @@
 
     </v-navigation-drawer>
 
-    <v-toolbar app absolute clipped-left>
+    <v-toolbar app clipped-left>
+      <div class="toolbar-band blue darken-1"></div>
       <v-toolbar-side-icon @click.native="drawer = !drawer"></v-toolbar-side-icon>
 
       <v-toolbar-items>
@@ -78,8 +78,10 @@ export default {
   min-height: 5px;
 
   position: absolute;
+  top: 0;
+  left: 0;
 
-  z-index: 4;
+  /* z-index: 4; */
 }
 
 .v-navigation-drawer a:hover { text-decoration: none !important; }
