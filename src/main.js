@@ -10,7 +10,7 @@ import codemirror from './modules/codemirror'
 //import xterm from './modules/'
 
 import App from './App'
-import ssh from '@/components/Ssh2'
+import ssh from '@/components/SshKube'
 
 Vue.config.productionTip = false
 Vue.prototype.$http = Axios

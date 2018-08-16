@@ -121,7 +121,7 @@
 
         <v-card-text>
           <!-- https://kr.vuejs.org/v2/guide/components.html#%EB%8F%99%EC%A0%81-Props -->
-          <ssh ref="ssh" :info="ssh"></ssh>
+          <ssh-kube :info="ssh"></ssh-kube>
         </v-card-text>
 
         <v-card-actions>

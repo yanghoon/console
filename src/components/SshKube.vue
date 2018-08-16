@@ -3,7 +3,7 @@
     <form>
       <v-text-field v-model="endpoint" label="Pod Endpoint" readonly></v-text-field>
 
-      <v-layout row wrap align-center justify-start>
+      <v-layout row align-center justify-start>
         <v-select :items="con.items" v-model="con.selected" label="Container" auto></v-select>
         <div class="text-md-center"> <span>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</span> </div>
         <v-select :items="shell.items" v-model="shell.selected" label="Shell" auto></v-select>
@@ -47,7 +47,7 @@ Terminal.applyAddon(fit);
 var term_char_height = -1;
 
 export default {
-  name: 'ssh',
+  name: 'ssh-kube',
   props: ['info'],
   watch: {
     info: {
