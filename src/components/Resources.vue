@@ -49,7 +49,7 @@
                           append-icon="search" label="Search"></v-text-field>
           </v-card-title>
 
-          <v-data-table :headers="table.headers" :items="table.items" :loading="table.loading" :search="table.keyword" hide-actions class="elevation-1">
+          <v-data-table :headers="headers" :items="table.items" :loading="table.loading" :search="table.keyword" hide-actions class="elevation-1">
             <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
 
             <template slot="items" slot-scope="props">
@@ -176,11 +176,6 @@ function expandFields(){
   return arr
 }
 
-function handler(comp, pods){
-  comp.pod = pods
-  comp.table.items = pods.items
-}
-
 import 'codemirror/theme/base16-dark.css'
 import 'codemirror/mode/yaml/yaml.js'
 
@@ -220,7 +215,6 @@ export default {
         },
       ],
       table: {
-        headers: expandFields(),
         items: [],
         loading: false,
         keyword: ""
@@ -245,6 +239,13 @@ export default {
         pod: undefined,
         con: {}
       }
+    }
+  },
+  computed: {
+    headers (){
+      var kind = this.select[2].selected
+      //if(kind == 'svc')
+      return expandFields()
     }
   },
   mounted() {
