@@ -63,7 +63,7 @@
 
                 <v-tooltip right :open-delay="0" :close-delay="0">
                   <v-btn slot="activator" color="primary" flat icon
-                         @click.native="showEditor(props.item)">
+                         @click="showEditor(props.item)">
                     <v-icon>create</v-icon>
                   </v-btn>
                   <span>Edit Yaml</span>
@@ -71,14 +71,15 @@
 
                 <v-tooltip right :open-delay="0" :close-delay="0">
                   <v-btn slot="activator" color="primary" flat icon
-                         @click.native="showSsh(props.item)">
+                         @click="showSsh(props.item)">
                     <v-icon>web_asset</v-icon>
                   </v-btn>
                   <span>Open Shell</span>
                 </v-tooltip>
 
                 <v-tooltip right :open-delay="0" :close-delay="0">
-                  <v-btn slot="activator" color="primary" flat icon disabled>
+                  <v-btn slot="activator" color="primary" flat icon
+                         @click="showLog(props.item)">
                     <v-icon>notes</v-icon>
                   </v-btn>
                   <span>Logs</span>
@@ -107,8 +108,8 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="editor.show = false" disabled>Save</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="editor.show = false">Close</v-btn>
+          <v-btn color="blue darken-1" flat @click="editor.show = false" v-if="false" disabled>Save</v-btn>
+          <v-btn color="blue darken-1" flat @click="editor.show = false">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -126,8 +127,25 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="ssh.show = false" disabled>Save</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="ssh.show = false">Close</v-btn>
+          <v-btn color="blue darken-1" flat @click="ssh.show = false">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="log.show" max-width="1000" lazy>
+      <v-card>
+        <v-card-title class="headline grey lighten-2" primary-title>
+          {{ log.selected && log.selected.metadata.name }}
+        </v-card-title>
+
+        <v-card-text>
+          <!-- https://kr.vuejs.org/v2/guide/components.html#%EB%8F%99%EC%A0%81-Props -->
+          <ssh-log :info="log"></ssh-log>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" flat @click="log.show = false">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -238,6 +256,13 @@ export default {
         ns: undefined,
         pod: undefined,
         con: {}
+      },
+      log: {
+        show: false,
+        cs: undefined,
+        ns: undefined,
+        pod: undefined,
+        con: {}
       }
     }
   },
@@ -322,6 +347,15 @@ export default {
           this.editor.code = res.data
         })
       */
+    },
+    showLog (item) {
+      this.log.show = true;
+      this.log.selected = item;
+
+      this.log.cs = this.select[0].selected;
+      this.log.ns = this.select[1].selected;
+      this.log.pod = item.metadata.name;
+      this.log.con.items = _.map(item.spec.containers, (con) => {return con.name})
     },
     getResources () {
       var api = '/api'

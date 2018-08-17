@@ -5,16 +5,10 @@
 
       <v-layout row align-center justify-start>
         <v-select :items="con.items" v-model="con.selected" label="Container" auto></v-select>
-        <div class="text-md-center"> <span>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</span> </div>
-        <v-select :items="shell.items" v-model="shell.selected" label="Shell" auto></v-select>
+        <v-text-field v-model="param.tail" label="Tail"></v-text-field>
 
-        <v-spacer></v-spacer>
-
-        <v-btn color="primary" @click.native="connect()" :disabled="!!ws">
-          <v-icon left>desktop_windows</v-icon> Connect
-        </v-btn>
-        <v-btn color="primary" @click.native="disconnect()" :disabled="!ws">
-          <v-icon left>desktop_windows</v-icon> Disconnect
+        <v-btn color="primary" @click="logs()">
+          <v-icon left>desktop_windows</v-icon> Show 
         </v-btn>
       </v-layout>
 
@@ -47,7 +41,7 @@ Terminal.applyAddon(fit);
 var term_char_height = -1;
 
 export default {
-  name: 'ssh-kube',
+  name: 'ssh-log',
   props: ['info'],
   watch: {
     info: {
@@ -65,12 +59,11 @@ export default {
       ns: undefined,
       pod: undefined,
       con: {},
-      shell: {
-        selected: 'bash',
-        items: ['bash', 'sh']
+      param: {
+        tail: 10
       },
-      ws: undefined,
       terminal: {
+        cols: 0,
         term: null,
         terminalSocket: null
       }
@@ -86,38 +79,42 @@ export default {
       this.con.selected = _new.con.items[0]
       this.endpoint = `/api/v1/namespaces/${this.ns}/pods/${this.pod}`
 
+      this.clear()
+    },
+    clear() {
       this.terminal.term.reset()
-      this.disconnect()
     },
-    disconnect () {
-      this.ws && this.ws.close()
-    },
-    connect () {
+    logs () {
       var api = '/api'
       var term = this.terminal.term
 
       // https://github.com/xtermjs/xterm.js/issues/943#issuecomment-327367759
-      term.reset()
+      this.clear()
 
       // https://github.com/websockets/wscat/blob/master/bin/wscat#L248
-      var server = location.protocol.replace('http', 'ws') + '//' + location.host
-      var url = `${server}${api}/shell?cs=${this.cs}&ns=${this.ns}&pod=${this.pod}&con=${this.con.selected}&shell=${this.shell.selected}`
-      const ws = new WebSocket(url);
-      this.ws = ws
+      var param = {
+        cs: this.cs, ns: this.ns,
+        pod: this.pod,
+        con: this.con.selected
+      }
+      Object.assign(param, this.param)
 
-      ws.onopen = () => {
-        console.log('open')
-      }
-      ws.onclose = (ev) => {
-        console.log('close :: ', ev.code)
-        this.ws = undefined
-      }
-      ws.onerror = (err) => {
-        console.log('error :: ', err)
-      }
-      ws.onmessage = (msg) => {
-        this.terminal.term.write(msg.data)
-      }
+      this.$http
+        .get(`${api}/log`, {params: param})
+        .then((res) => {
+          var len = this.terminal.cols
+          var rows = res.data.split('\n')
+          for(var i=0; i<rows.length; i++){
+            this.terminal.term.write(rows[i])
+            this.terminal.term.write('\r\n')
+            len = Math.max(len, rows[i].length)
+          }
+
+          if(this.terminal.cols != len){
+            this.terminal.cols = len
+            term.resize(this.terminal.cols, this.terminal.rows)
+          }
+        })
     },
     resize () {
       /*
@@ -157,7 +154,11 @@ export default {
       //       _measureElement.classList.add('xterm-char-measure-element')
       console.log('term :: do resize terminal.')
       term._core.charMeasure.measure(term._core.options)
-      term.fit()
+      //term.fit()
+      var size = term.proposeGeometry()
+      this.terminal.rows = size.rows
+      this.terminal.cols = Math.max(size.cols, this.terminal.cols)
+      term.resize(this.terminal.cols, this.terminal.rows)
 
       term_char_height = _new
     }
@@ -177,35 +178,17 @@ export default {
     term.open(terminalContainer);
     term.fit()
 
-    term.on('data', (data) => {
-      this.ws && this.ws.send(data)
-    })
-    term.on('key', (k, e) => {
-      var printable = (
-        !e.altKey && !e.altGraphKey && !e.ctrlKey && !e.metaKey
-        && e.keyCode < 128
-      );
-
-      return
-
-      if(printable){
-        this.ws && this.ws.send(k)
-      }
-    })
-
     this.terminal.term = term;
     this.bindProps(this.info)
     this.$nextTick(this.resize)
   },
   updated () {
     this.$nextTick(this.resize)
-  },
-  beforeDestroy () {
-    this.disconnect()
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.console { overflow-x: scroll; }
 </style>

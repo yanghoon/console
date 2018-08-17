@@ -36,6 +36,7 @@ app.get("/api/cluster/:cluster/namespace/list", (req, res) => {
   }) 
 })
 
+/*
 app.get("/api/cluster/:cluster/namespace/:ns/pod/list", (req, res) => {
   var kubectl = K8s.kubectl({
     binary: 'kubectl',
@@ -47,6 +48,23 @@ app.get("/api/cluster/:cluster/namespace/:ns/pod/list", (req, res) => {
     console.log(req.url, req.params)
     res.send(ns)
   }) 
+})
+*/
+
+app.get("/api/log", (req, res) => {
+  // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.10/#read-log
+
+  var flag = []
+  flag.push('--tail')
+  flag.push(req.query.tail || 10)
+
+  var kubectl = K8s.kubectl({kubeconfig: cluster.getPath(req.query.cs)})
+  var cmd = `logs ${req.query.pod} -n ${req.query.ns} -c ${req.query.con} ` + flag.join(' ')
+
+  kubectl.command(cmd).then(function(data){
+    console.log(req.url, req.query)
+    res.send(data)
+  })
 })
 
 app.ws('/api/shell', function(client, req){

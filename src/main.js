@@ -11,11 +11,13 @@ import codemirror from './modules/codemirror'
 
 import App from './App'
 import ssh from '@/components/SshKube'
+import log from '@/components/SshLog'
 
 Vue.config.productionTip = false
 Vue.prototype.$http = Axios
 
 Vue.component(ssh.name, ssh)  // https://stackoverflow.com/a/44568550
+Vue.component(log.name, log)  // https://stackoverflow.com/a/44568550
 
 /* eslint-disable no-new */
 new Vue({
