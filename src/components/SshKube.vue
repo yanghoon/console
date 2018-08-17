@@ -1,7 +1,7 @@
 <template>
   <div>
     <form>
-      <v-text-field v-model="endpoint" label="Pod Endpoint" readonly></v-text-field>
+      <v-text-field v-if="false" v-model="endpoint" label="Pod Endpoint" readonly></v-text-field>
 
       <v-layout row align-center justify-start>
         <v-select :items="con.items" v-model="con.selected" label="Container" auto></v-select>
@@ -60,7 +60,7 @@ export default {
   },
   data () {
     return {
-      endpoint:'',
+      endpoint: undefined,
       cs: undefined,
       ns: undefined,
       pod: undefined,
