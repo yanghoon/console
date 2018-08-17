@@ -102,17 +102,19 @@ export default {
       this.$http
         .get(`${api}/log`, {params: param})
         .then((res) => {
+          var term = this.terminal.term
           var len = this.terminal.cols
+          
           var rows = res.data.split('\n')
           for(var i=0; i<rows.length; i++){
-            this.terminal.term.write(rows[i])
-            this.terminal.term.write('\r\n')
+            term.write(rows[i])
+            term.write('\r\n')
             len = Math.max(len, rows[i].length)
           }
 
           if(this.terminal.cols != len){
             this.terminal.cols = len
-            term.resize(this.terminal.cols, this.terminal.rows)
+            term.resize(this.terminal.cols, term._core.options.rows)
           }
         })
     },
@@ -154,11 +156,7 @@ export default {
       //       _measureElement.classList.add('xterm-char-measure-element')
       console.log('term :: do resize terminal.')
       term._core.charMeasure.measure(term._core.options)
-      //term.fit()
-      var size = term.proposeGeometry()
-      this.terminal.rows = size.rows
-      this.terminal.cols = Math.max(size.cols, this.terminal.cols)
-      term.resize(this.terminal.cols, this.terminal.rows)
+      term.fit()
 
       term_char_height = _new
     }
