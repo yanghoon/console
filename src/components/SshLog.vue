@@ -83,6 +83,7 @@ export default {
     },
     clear() {
       this.terminal.term.reset()
+      this.terminal.cols = 0
     },
     logs () {
       var api = '/api'
@@ -188,5 +189,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.console { overflow-x: scroll; }
+.console { overflow-x: auto; }
 </style>
