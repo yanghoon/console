@@ -27,7 +27,7 @@ export default new Router({
       component: Resources
     },
     {
-      path: '/pod/:id',
+      path: '/:resource/:id',
       name: 'ResourceDetail',
       component: ResourceDetail
     },

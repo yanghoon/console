@@ -3,42 +3,59 @@
     <v-layout row wrap align-center justify-center>
       <v-flex xs11>
 
-        <v-layout row align-space-between column v-for="(value, key) in item" :key="item.key" v-if="skip_root.indexOf(key) == -1">
-          <v-flex>
-            <span class="subheading font-weight-regular">{{ key }}</span>
+        <v-layout wrap column fill-height>
+          <v-flex xs12>
+
+            <div v-for="(value, key) in item" :key="item.key" v-if="skip_root.indexOf(key) == -1">
+              <v-card>
+                <v-card-title class="subheading font-weight-regular">{{ key }}</v-card-title>
+                <v-divider></v-divider>
+
+                <v-card-text>
+                  <v-layout v-for="(v, k) in value" :key="value.k">
+                    <v-flex xs2 v-if="skip_obj_key.indexOf(k) == -1"> {{ k }} </v-flex>
+                    <v-flex xs6 v-if="skip_obj_val.indexOf(k) == -1"> {{ v }}</v-flex>
+
+                    <!-- metadata.name -->
+                    <v-flex xs6 v-if="'name' == k">
+                      <strong>{{ v }}</strong>
+                      &nbsp;
+                      <span>({{ value.creationTimestamp | moment('from', true) }})</span>
+                      <!--
+                        - http://momentjs.com/docs/#/i18n/
+                        - https://www.npmjs.com/package/vue-moment
+                      -->
+                    </v-flex>
+
+                    <!-- metadata.labels -->
+                    <v-flex xs6 v-if="['labels', 'annotations'].indexOf(k) != -1">
+                      <v-chip v-for="(lv, lk) in v" :key="v.lk">
+                        <strong>{{ lk }}:</strong>
+                        &nbsp;
+                        <span>{{ lv }}</span>
+                      </v-chip>
+                    </v-flex>
+
+                    <!-- metadata.ownerReferences -->
+                    <v-flex xs6 v-if="'ownerReferences' == k">
+                      {{ `${v[0].kind.toLowerCase()}/${v[0].name}` }}
+                    </v-flex>
+
+                    <v-flex xs6 v-if="'volumes' == k">
+                        <v-chip v-for="l in v">
+                          <strong>{{ l.name }} :: </strong>
+                          {{ _.omit(l, 'name') }}
+                        </v-chip>
+                    </v-flex>
+
+                  </v-layout>
+                </v-card-text>
+              </v-card>
+              
+              <v-flex xs12>&nbsp;</v-flex>
+            </div>
+
           </v-flex>
-
-          <v-card>
-            <!-- <v-card-title></v-card-title> -->
-            <v-card-text>
-              <v-layout v-for="(v, k) in value" :key="value.k">
-                <v-flex xs2> {{ k }} </v-flex>
-                <v-flex xs6 v-if="skip_obj.indexOf(k) == -1"> {{ v }}</v-flex>
-
-                <!-- metadata.labels -->
-                <v-flex xs6 v-if="'labels' == k">
-                  <v-chip v-for="(lv, lk) in v" :key="v.lk">
-                    <strong>{{ lk }}:</strong>
-                    &nbsp;
-                    <span>{{ lv }}</span>
-                  </v-chip>
-                </v-flex>
-
-                <!-- metadata.ownerReferences -->
-                <v-flex xs6 v-if="'ownerReferences' == k">
-                  {{ `${v[0].kind.toLowerCase()}/${v[0].name}` }}
-                </v-flex>
-
-                <v-flex xs6 v-if="'volumes' == k">
-                    <v-chip v-for="l in v">
-                      <strong>{{ l.name }} :: </strong>
-                      {{ _.omit(l, 'name') }}
-                    </v-chip>
-                </v-flex>
-              </v-layout>
-            </v-card-text>
-          </v-card>
-
         </v-layout>
         <!--
           Event List
@@ -56,14 +73,16 @@ export default {
   name: 'ResourceDetail',
   data () {
   	var d = {}
-  	d.kind = 'pod'
+  	d.kind = this.$route.params.resource
   	d.cs = this.$route.query.cs
   	d.ns = this.$route.query.ns
   	d.name = this.$route.params.id
   	d.item = undefined
 
-    d.skip_root = ['apiVersion','kind']
-    d.skip_obj  = ['labels', 'ownerReferences', 'volumes']
+    d.skip_root = ['apiVersion', 'kind']
+    d.skip_obj_key = ['creationTimestamp']
+    d.skip_obj_val = ['name', 'labels', 'annotations', 'ownerReferences', 'volumes']
+    d.skip_obj_val = d.skip_obj_val.concat(d.skip_obj_key)
 
   	return d
   },

@@ -28,6 +28,7 @@
     "socket.io-client": "^2.1.1",
     "vue": "^2.5.2",
     "vue-codemirror": "^4.0.5",
+    "vue-moment": "^4.0.0",
     "vue-router": "^3.0.1",
     "vue-term": "^0.1.2",
     "vue2-codemirror-lite-js": "^3.5.10",

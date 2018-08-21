@@ -5,6 +5,7 @@ import Axios from 'axios'   // http://vuejs.kr/update/2017/01/04/http-request-wi
 
 import router from './modules/router'
 //import bootstrap from './modules/bootstrap'
+import moment from './modules/moment'
 import vuetify from './modules/vuetify'
 import codemirror from './modules/codemirror'
 //import xterm from './modules/'

@@ -55,7 +55,7 @@
             <template slot="items" slot-scope="props">
               <td class="text-xs-left">
                 <!-- https://router.vuejs.org/kr/guide/essentials/navigation.html -->
-                <router-link :to="`/pod/${props.item.metadata.name}?cs=${select[0].selected}&ns=${select[1].selected}`">
+                <router-link :to="`/${select[2].selected}/${props.item.metadata.name}?cs=${select[0].selected}&ns=${select[1].selected}`">
                   {{ props.item.metadata.name }}
                 </router-link>
               </td>
