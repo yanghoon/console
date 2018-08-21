@@ -53,7 +53,12 @@
             <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
 
             <template slot="items" slot-scope="props">
-              <td class="text-xs-left">{{ props.item.metadata.name }}</td>
+              <td class="text-xs-left">
+                <!-- https://router.vuejs.org/kr/guide/essentials/navigation.html -->
+                <router-link :to="`/pod/${props.item.metadata.name}?cs=${select[0].selected}&ns=${select[1].selected}`">
+                  {{ props.item.metadata.name }}
+                </router-link>
+              </td>
               <td class="text-xs-center">{{ "-" }}</td>
               <td class="text-xs-center">{{ props.item.status ? props.item.status.phase : '-' }}</td>
               <td class="text-xs-center">{{ "-" }}</td>

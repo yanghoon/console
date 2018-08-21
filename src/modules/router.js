@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Resources from '@/components/Resources'
+import ResourceDetail from '@/components/ResourceDetail'
 import Codemirror from '@/components/Codemirror'
 import Conf from '@/components/Conf'
 import Ssh from '@/components/Ssh'
@@ -24,6 +25,11 @@ export default new Router({
       path: '/',
       name: 'Resources',
       component: Resources
+    },
+    {
+      path: '/pod/:id',
+      name: 'ResourceDetail',
+      component: ResourceDetail
     },
     {
       path: '/code',
