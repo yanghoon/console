@@ -193,11 +193,18 @@ export default {
       }
     })
 
-    // clipboard control
-    // - https://github.com/xtermjs/xterm.js/issues/185
-    // - https://github.com/xtermjs/xterm.js/issues/292
+    
+    // Selection of Xterm
+    // - https://github.com/xtermjs/xterm.js/blob/master/src/SelectionManager.ts#L637
     term.on('selection', () => {
-      // - https://github.com/xtermjs/xterm.js/blob/master/src/SelectionManager.ts#L637
+      // Control clipboard
+      //  in xterm
+      //  - https://github.com/xtermjs/xterm.js/issues/185
+      //  - https://github.com/xtermjs/xterm.js/issues/292
+      //  npm lib
+      //  - https://github.com/lgarron/clipboard-polyfill
+      //  - https://github.com/zenorocha/clipboard.js
+      //  - https://github.com/Inndy/vue-clipboard2
       console.log(term.getSelection())
     })
 

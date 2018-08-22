@@ -119,10 +119,14 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="ssh.show" max-width="1000" lazy>
+    <v-dialog v-model="ssh.show" max-width="1000" lazy :fullscreen="ssh.full">
       <v-card>
         <v-card-title class="headline grey lighten-2" primary-title>
           {{ ssh.selected && ssh.selected.metadata.name }}
+          <v-spacer></v-spacer>
+          <v-btn color="primary" flat icon @click="ssh.full = !ssh.full">
+            <v-icon>{{ !ssh.full ? 'fullscreen' : 'fullscreen_exit' }}</v-icon>
+          </v-btn>
         </v-card-title>
 
         <v-card-text>
@@ -260,6 +264,7 @@ export default {
         cs: undefined,
         ns: undefined,
         pod: undefined,
+        full: false,
         con: {}
       },
       log: {
