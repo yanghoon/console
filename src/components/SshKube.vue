@@ -193,6 +193,14 @@ export default {
       }
     })
 
+    // clipboard control
+    // - https://github.com/xtermjs/xterm.js/issues/185
+    // - https://github.com/xtermjs/xterm.js/issues/292
+    term.on('selection', () => {
+      // - https://github.com/xtermjs/xterm.js/blob/master/src/SelectionManager.ts#L637
+      console.log(term.getSelection())
+    })
+
     this.terminal.term = term;
     this.bindProps(this.info)
     this.$nextTick(this.resize)
