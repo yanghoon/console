@@ -6,6 +6,9 @@
         <v-layout wrap column fill-height>
           <v-flex xs12>
 
+            <span class="display-1"> {{ item && item.kind }} </span>
+            <v-flex xs12>&nbsp;</v-flex>
+
             <div v-for="(value, key) in item" :key="item.key" v-if="skip_root.indexOf(key) == -1">
               <v-card>
                 <v-card-title class="subheading font-weight-regular">{{ key }}</v-card-title>
@@ -38,7 +41,9 @@
 
                     <!-- metadata.ownerReferences -->
                     <v-flex xs6 v-if="'ownerReferences' == k">
-                      {{ `${v[0].kind.toLowerCase()}/${v[0].name}` }}
+                      <router-link :to="`/${v[0].kind.toLowerCase()}/${v[0].name}?cs=${cs}&ns=${ns}`">
+                        {{ `${v[0].kind.toLowerCase()}/${v[0].name}` }}
+                      </router-link>
                     </v-flex>
 
                     <v-flex xs6 v-if="'volumes' == k">
@@ -84,6 +89,8 @@ export default {
     d.skip_obj_val = ['name', 'labels', 'annotations', 'ownerReferences', 'volumes']
     d.skip_obj_val = d.skip_obj_val.concat(d.skip_obj_key)
 
+    console.log('data call')
+
   	return d
   },
   computed: {
@@ -95,7 +102,15 @@ export default {
   	  .then((res) => {
   	  	this.item = res.data
   	  })
-
+  },
+  beforeRouteUpdate (to, from, next) {
+    // - https://router.vuejs.org/guide/advanced/navigation-guards.html#in-component-guards
+    this.$http
+      .get(`/api/${to.params.resource}/${to.params.id}?cs=${to.query.cs}&ns=${to.query.ns}`)
+      .then((res) => {
+        this.item = res.data
+      })
+    next()
   }
 }
 </script>

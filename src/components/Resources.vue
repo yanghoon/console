@@ -63,7 +63,7 @@
               <td class="text-xs-center">{{ props.item.status ? props.item.status.phase : '-' }}</td>
               <td class="text-xs-center">{{ "-" }}</td>
               <!-- <td class="text-xs-center">{{ props.item.status.startTime }}</td> -->
-              <td class="text-xs-center">{{ props.item.metadata.creationTimestamp }}</td>
+              <td class="text-xs-center">{{ props.item.metadata.creationTimestamp | moment('from', true) }}</td>
               <td class="text-xs-center">
 
                 <v-tooltip right :open-delay="0" :close-delay="0">
