@@ -237,7 +237,9 @@ export default {
             {text:"Secret", value:"secrets"},
             {text:"PersistentVolume", value:"pv"},
             {text:"PersistentVolumeClaim", value:"pvc"},
-            {text:"StatefulSets", value:"statefulset"}
+            {text:"StatefulSets", value:"statefulset"},
+            {text:"CronJob", value:"cronjob"},
+            {text:"Job", value:"job"}
           ]
         },
       ],

@@ -43,6 +43,8 @@ import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
 Terminal.applyAddon(fit);
 
+import clipboard from 'clipboard-polyfill/build/clipboard-polyfill.promise';
+
 // variable not in vue
 var term_char_height = -1;
 
@@ -205,7 +207,7 @@ export default {
       //  - https://github.com/lgarron/clipboard-polyfill
       //  - https://github.com/zenorocha/clipboard.js
       //  - https://github.com/Inndy/vue-clipboard2
-      console.log(term.getSelection())
+      clipboard.writeText(term.getSelection())
     })
 
     this.terminal.term = term;
