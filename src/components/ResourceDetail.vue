@@ -47,7 +47,7 @@
                     </v-flex>
 
                     <v-flex xs6 v-if="'volumes' == k">
-                        <v-chip v-for="l in v">
+                        <v-chip v-for="l in v" :key="l.name">
                           <strong>{{ l.name }} :: </strong>
                           {{ _.omit(l, 'name') }}
                         </v-chip>

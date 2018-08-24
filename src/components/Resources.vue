@@ -121,7 +121,7 @@
 
     <v-dialog v-model="ssh.show" max-width="1000" lazy :fullscreen="ssh.full">
       <v-card>
-        <v-card-title class="headline grey lighten-2" primary-title>
+        <v-card-title class="ssh-dialog headline grey lighten-2">
           {{ ssh.selected && ssh.selected.metadata.name }}
           <v-spacer></v-spacer>
           <v-btn color="primary" flat icon @click="ssh.full = !ssh.full">
@@ -398,4 +398,6 @@ export default {
 .vue-codemirror { text-align: left!important; }
 .CodeMirror { height: 500px; }
 .CodeMirror-hints { z-index: 203 !important; }
+
+.ssh-dialog { padding: 8px; font-size: 20px!important;}
 </style>

@@ -29,6 +29,11 @@
     
     <div class="console"></div>
 
+    <v-snackbar top right absolute :color="'info'"
+                v-model="snackbar.show" :timeout="snackbar.timeout" >
+      {{ snackbar.text }}
+      <v-btn v-if="false" flat @click="snackbar.show = false">Close</v-btn>
+    </v-snackbar>
   </div>
 </template>
 
@@ -53,10 +58,7 @@ export default {
   props: ['info'],
   watch: {
     info: {
-      handler(_new, _old){
-        console.log('WATCH !!')
-        this.bindProps(_new)
-      },
+      handler(_new, _old){ this.bindProps(_new) },
       deep:true
     }
   },
@@ -75,6 +77,11 @@ export default {
       terminal: {
         term: null,
         terminalSocket: null
+      },
+      snackbar: {
+        show: false,
+        text: 'copied',
+        timeout: 800 // ms
       }
     }
   },
@@ -88,8 +95,12 @@ export default {
       this.con.selected = _new.con.items[0]
       this.endpoint = `/api/v1/namespaces/${this.ns}/pods/${this.pod}`
 
-      this.terminal.term.reset()
-      this.disconnect()
+      if(!_new.show){
+        this.terminal.term.reset()
+        this.disconnect()
+      } else if(this.terminal.term) {
+        this.$nextTick(this.resize)
+      }
     },
     disconnect () {
       this.ws && this.ws.close()
@@ -162,6 +173,13 @@ export default {
       term.fit()
 
       term_char_height = _new
+
+      //term.write(`COLUMNS=${term._core.options.cols};LINES=${term._core.options.rows};export COLUMNS LINES;\n`)
+      return true;
+    },
+    copy () {
+      this.snackbar.show = true
+      console.log(this.snackbar.show)
     }
   },
   mounted () {
@@ -208,6 +226,8 @@ export default {
       //  - https://github.com/zenorocha/clipboard.js
       //  - https://github.com/Inndy/vue-clipboard2
       clipboard.writeText(term.getSelection())
+      console.log(term.getSelection())
+      this.copy()
     })
 
     this.terminal.term = term;
@@ -225,4 +245,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.console { height: 100%; }
 </style>
