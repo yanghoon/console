@@ -61,9 +61,71 @@ app.get("/api/log", (req, res) => {
   var kubectl = K8s.kubectl({kubeconfig: cluster.getPath(req.query.cs)})
   var cmd = `logs ${req.query.pod} -n ${req.query.ns} -c ${req.query.con} ` + flag.join(' ')
 
+  console.log(req.url, cmd)
   kubectl.command(cmd).then(function(data){
     console.log(req.url, req.query)
     res.send(data)
+  })
+})
+
+app.ws("/api/log", (client, req) => {
+  // https://stackoverflow.com/a/39233132
+  console.log('wss://api/log')
+  console.log(req.url, req.query)
+
+  var conf = cluster.loadConf(req.query.cs, true)
+  if(!conf){
+    client.send(`There is no cluster '${cs}'`)
+    client.close()
+    return
+  }
+
+  var cs = _.find(conf.clusters, (c) => {return c.name == req.query.cs}).cluster
+  var token = _.map(conf.users, (u) => {return u.user && u.user.token})[0]
+
+  //var server = cs.server.replace(/http/, 'ws') 
+  var server = cs.server
+  var endpoint = `/api/v1/namespaces/${req.query.ns}/pods/${req.query.pod}`
+
+  var url = server + endpoint + `/log?container=${req.query.con}&tailLines=${req.query.tail || 10}&follow=true`;
+  var opts = {
+    headers: {Authorization: `Bearer ${token}`},
+    ca: new Buffer(cs['certificate-authority-data'], 'base64')
+  }
+
+  console.log(url)
+  console.log(opts)
+
+  // connect to pod
+  var ws = new WebSocket(url, opts)
+  ws.on('open',  () => { console.log('K8S-LOG :: Open')})
+  ws.on('error', (err) => {
+    console.log('K8S-LOG :: Error - ', err)
+    client.send(err.message)
+    client.close()
+  })
+  ws.on('close', (code) => {
+    console.log('K8S-LOG :: Close - ', code)
+
+    if(client.readyState === WebSocket.OPEN)
+      client.send(code)
+    
+    client.close()
+  })
+  ws.on('message', (data) => {
+    // https://stackoverflow.com/a/38237610
+    console.log("K8S-LOG :: MESSAGE ", data, data.toString())
+    if(data.length != 0)
+      client.send(data.toString())
+  })
+
+  // relay to clinet
+  client.on('close', function(code){
+    ws.close()
+    client = {
+      send () {},
+      close () {}
+    }
   })
 })
 

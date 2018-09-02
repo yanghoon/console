@@ -5,7 +5,9 @@
 
       <v-layout row align-center justify-start>
         <v-select :items="con.items" v-model="con.selected" label="Container" auto></v-select>
+
         <v-text-field v-model="param.tail" label="Tail"></v-text-field>
+        <v-checkbox v-model="param.follow" label="Follow"></v-checkbox>
 
         <v-btn color="primary" @click="logs()">
           <v-icon left>desktop_windows</v-icon> Show 
@@ -40,6 +42,8 @@ Terminal.applyAddon(fit);
 // variable not in vue
 var term_char_height = -1;
 
+const _ = require('underscore');
+
 export default {
   name: 'ssh-log',
   props: ['info'],
@@ -66,7 +70,8 @@ export default {
         cols: 0,
         term: null,
         terminalSocket: null
-      }
+      },
+      ws: undefined
     }
   },
   methods: {
@@ -84,6 +89,10 @@ export default {
     clear() {
       this.terminal.term.reset()
       this.terminal.cols = 0
+      if(this.ws){
+        this.ws.close()
+        this.ws = undefined
+      }
     },
     logs () {
       var api = '/api'
@@ -99,6 +108,47 @@ export default {
         con: this.con.selected
       }
       Object.assign(param, this.param)
+
+      if(param.follow){
+        // https://github.com/websockets/wscat/blob/master/bin/wscat#L248
+        var server = location.protocol.replace('http', 'ws') + '//' + location.host
+        var url = `${server}${api}/log?`
+        var query = _.map(param, (v,k)=>{return `${k}=${v}`}).join('&');
+
+        const ws = new WebSocket(url + query);
+        this.ws = ws
+
+        ws.onopen = () => {
+          console.log('open')
+        }
+        ws.onclose = (ev) => {
+          console.log('close :: ', ev.code)
+          this.ws = undefined
+        }
+        ws.onerror = (err) => {
+          console.log('error :: ', err)
+        }
+        ws.onmessage = (res) => {
+          var term = this.terminal.term
+          var len = this.terminal.cols
+
+          console.log(res.data)
+          
+          var rows = [res.data.trim()]
+          for(var i=0; i<rows.length; i++){
+            term.write(rows[i])
+            term.write('\r\n')
+            len = Math.max(len, rows[i].length)
+          }
+
+          if(this.terminal.cols != len){
+            this.terminal.cols = len
+            term.resize(this.terminal.cols, term._core.options.rows)
+          }
+        }
+
+        return
+      }
 
       this.$http
         .get(`${api}/log`, {params: param})
