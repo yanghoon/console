@@ -74,7 +74,8 @@
                   <span>Edit Yaml</span>
                 </v-tooltip>
 
-                <v-tooltip right :open-delay="0" :close-delay="0">
+                <v-tooltip right :open-delay="0" :close-delay="0"
+                           v-if="select[2].selected == 'pod'">
                   <v-btn slot="activator" color="primary" flat icon
                          @click="showSsh(props.item)">
                     <v-icon>web_asset</v-icon>
@@ -82,7 +83,8 @@
                   <span>Open Shell</span>
                 </v-tooltip>
 
-                <v-tooltip right :open-delay="0" :close-delay="0">
+                <v-tooltip right :open-delay="0" :close-delay="0"
+                           v-if="select[2].selected == 'pod'">
                   <v-btn slot="activator" color="primary" flat icon
                          @click="showLog(props.item)">
                     <v-icon>notes</v-icon>
@@ -163,16 +165,8 @@
 </template>
 
 <script>
-var meta = {
-  "Name": "sortable | value=metadata.name | align=left",
-  "Node": "value=kind",
-  "Status": "sortable | value=status.phase",
-  "Restarts": "value=value",
-  "Age":"sortable | value=status.startTime",
-  "":"value=none",
-}
 
-function expandFields(){
+function expandFields(meta){
   var arr = [];
   for(var name in meta){
     var m = meta[name].split(/ ?\| ?/);
@@ -246,7 +240,8 @@ export default {
       table: {
         items: [],
         loading: false,
-        keyword: ""
+        keyword: "",
+        headers: []
       },
       editor: {
         show: false,
@@ -280,9 +275,21 @@ export default {
   },
   computed: {
     headers (){
+      var meta = {
+        "Name": "sortable | value=metadata.name | align=left",
+        "Node": "value=kind",
+        "Status": "sortable | value=status.phase",
+        "Restarts": "value=value",
+        "Age":"sortable | value=status.startTime",
+        "":"value=none",
+      }
+
       var kind = this.select[2].selected
-      //if(kind == 'svc')
-      return expandFields()
+      if(kind == 'ing'){
+        meta.Endpoint = "value=spec.rules[0].host"
+      }
+
+      return expandFields(meta)
     }
   },
   mounted() {

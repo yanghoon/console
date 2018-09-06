@@ -230,6 +230,10 @@ export default {
       this.copy()
     })
 
+    //Right Click Paste
+    // - https://github.com/xtermjs/xterm.js/blob/master/src/Terminal.ts#L558
+    // - https://github.com/xtermjs/xterm.js/blob/master/src/handlers/Clipboard.ts#L118
+
     this.terminal.term = term;
     this.bindProps(this.info)
     this.$nextTick(this.resize)

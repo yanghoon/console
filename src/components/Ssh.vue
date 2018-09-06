@@ -8,6 +8,10 @@
     <v-layout row wrap align-center justify-center>
       <v-flex xs11>
 
+        <v-alert :value="true" type="warning">
+          Deprecated. You can open web ssh in the <span class="subheading font-weight-bold red--text">Resources</span> menu.
+        </v-alert>
+
         <form>
           <v-text-field v-model="endpoint" label="Pod Endpoint" required></v-text-field>
 
