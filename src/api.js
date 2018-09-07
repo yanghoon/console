@@ -300,7 +300,6 @@ app.get("/api/:resource/:name", (req, res) => {
   cmd = `get ${req.params.resource} ${req.params.name} -n ${req.query.ns} --output=${req.query.type || 'json'}`
 
   kubectl.command(cmd).then(function(pod){
-  	console.log(req.url, req.params)
   	res.send(pod)
   })
 })

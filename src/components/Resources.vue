@@ -56,7 +56,7 @@
                   </router-link>
                 </template>
 
-                <!-- COMMON: resource detail view link -->
+                <!-- COMMON: Label (key,value) -->
                 <template v-else-if="meta.slot == 'label'">
                   <div v-for="(v, k) in _.property(meta.value.split('.'))(props.item)" :key="k">
                     <strong>{{ k }}:</strong>
@@ -66,21 +66,21 @@
 
                 <!-- COMMON: tools -->
                 <template v-else-if="meta.slot == 'action'">
-                  <v-tooltip right :open-delay="0" :close-delay="0">
+                  <v-tooltip right :open-delay="0.3" :close-delay="0.3">
                     <v-btn slot="activator" color="primary" flat icon @click="showEditor(props.item)">
                       <v-icon>create</v-icon>
                     </v-btn>
                     <span>Edit Yaml</span>
                   </v-tooltip>
 
-                  <v-tooltip right :open-delay="0" :close-delay="0" v-if="select[2].selected == 'pod'">
+                  <v-tooltip right :open-delay="0.3" :close-delay="0.3" v-if="select[2].selected == 'pod'">
                     <v-btn slot="activator" color="primary" flat icon @click="showSsh(props.item)">
                       <v-icon>web_asset</v-icon>
                     </v-btn>
                     <span>Open Shell</span>
                   </v-tooltip>
 
-                  <v-tooltip right :open-delay="0" :close-delay="0" v-if="select[2].selected == 'pod'">
+                  <v-tooltip right :open-delay="0.3" :close-delay="0.3" v-if="select[2].selected == 'pod'">
                     <v-btn slot="activator" color="primary" flat icon @click="showLog(props.item)">
                       <v-icon>notes</v-icon>
                     </v-btn>
@@ -96,6 +96,26 @@
                   <div v-for="img in _.map(props.item.spec.template.spec.containers, _.property('image'))">
                     {{ img }}
                   </div>
+                </template>
+
+                <!-- Ingress Rules -->
+                <template v-else-if="meta.slot == 'ingress'">
+                  <div v-for="rule in props.item.spec.rules">
+                    <v-tooltip v-for="svc in rule.http.paths" style="display: block;"
+                               right :open-delay="0.3" :close-delay="0.3">
+                      <a slot="activator" target="_blank" :href="`${props.item.spec.tls ? 'https' : 'http'}://${rule.host}${svc.path || ''}`">
+                        {{ `${props.item.spec.tls ? 'https' : 'http'}://${rule.host}${svc.path || ''}` }}
+                      </a>
+                      <span>
+                        {{ `service: ${svc.backend.serviceName}:${svc.backend.servicePort}` }}
+                      </span>
+                    </v-tooltip>
+                  </div>
+                </template>
+
+                <!-- POD -->
+                <template v-else-if="meta.slot == 'pod-restart'">
+                  {{ _.reduce(props.item.status.containerStatuses, (sum, item)=>{return sum + item.restartCount}, 0) || '-' }}
                 </template>
 
                 <template v-else>
@@ -182,9 +202,9 @@
 var meta = {
   // Pod (Common)
   "Name": "sortable | value=metadata.name | align=left | slot=link",
-  "Node": "value=kind",
+  "Node": "value=spec.nodeName",
   "Status": "sortable | value=status.phase",
-  "Restarts": "value=value",
+  "Restarts": "slot=pod-restart",
   "Age":"sortable | value=metadata.creationTimestamp | slot=from-now",
   "Action":"text= | value=none | slot=action",
   // Deployment
@@ -193,7 +213,7 @@ var meta = {
   "Strategy":"value=spec.strategy.type",
   "Images":"value=spec.selector.matchLabels | align=left | slot=images",
   // Ingerss
-  "Endpoint":"slot=link | value=spec.rules[0].host", //TODO
+  "Endpoint":"align=left | slot=ingress | value=spec.rules", //TODO
   // Service
   "ClusterIP":"align=left | value=spec.clusterIP",
   "Selector":"align=left | value=spec.selector | slot=label",
