@@ -58,7 +58,21 @@
 
                 <!-- COMMON: Label (key,value) -->
                 <template v-else-if="meta.slot == 'label'">
-                  <div v-for="(v, k) in _.property(meta.value.split('.'))(props.item)" :key="k">
+                  <v-tooltip v-if="_.size(props.item.metadata.labels) > 3" right :open-delay="0.3" :close-delay="0.3">
+                    <div slot="activator">
+                      <div v-for=" e in _.pairs(props.item.metadata.labels).slice(0, 2)" class="mb-1">
+                        <strong>{{ e[0] }}:</strong>
+                        <span>{{ e[1] }}</span>
+                      </div>
+                      <div>more..</div>
+                    </div>
+                    <div v-for="(v, k) in props.item.metadata.labels" :key="k" class="mb-1">
+                      <strong>{{ k }}:</strong>
+                      <span>{{ v }}</span>
+                    </div>
+                  </v-tooltip>
+
+                  <div v-else v-for="(v, k) in props.item.metadata.labels" :key="k" class="mb-2">
                     <strong>{{ k }}:</strong>
                     <span>{{ v }}</span>
                   </div>
@@ -100,9 +114,9 @@
 
                 <!-- Ingress Rules -->
                 <template v-else-if="meta.slot == 'ingress'">
-                  <div v-for="rule in props.item.spec.rules">
+                  <div v-for="rule in props.item.spec.rules" class="mb-2">
                     <v-tooltip v-for="svc in rule.http.paths" style="display: block;"
-                               right :open-delay="0.3" :close-delay="0.3">
+                               right :open-delay="0.3" :close-delay="0.3" :key="svc.path">
                       <a slot="activator" target="_blank" :href="`${props.item.spec.tls ? 'https' : 'http'}://${rule.host}${svc.path || ''}`">
                         {{ `${props.item.spec.tls ? 'https' : 'http'}://${rule.host}${svc.path || ''}` }}
                       </a>
@@ -207,6 +221,13 @@ var meta = {
   "Restarts": "slot=pod-restart",
   "Age":"sortable | value=metadata.creationTimestamp | slot=from-now",
   "Action":"text= | value=none | slot=action",
+  // Node
+  "Labels":"value=metadata.labels | align=left | slot=label",
+  "Ready":"value=status.a",
+  "CPU-Req":"value=status.a | text=CPU requests (cores)",
+  "CPU-Lmt":"value=status.b | text=CPU limits (cores)",
+  "Mem-Req":"value=status.c | text=Memory requests (bytes)",
+  "Mem-Lmt":"value=status.d | text=Memory limits (bytes)",
   // Deployment
   "Deploy-Status":"text=Status | slot=replica",
   "Deploy-Selector":"text=Selector | align=left | value=spec.selector.matchLabels | slot=label",
@@ -217,11 +238,13 @@ var meta = {
   // Service
   "ClusterIP":"align=left | value=spec.clusterIP",
   "Selector":"align=left | value=spec.selector | slot=label",
+  "Service-Endpoint":"text=Endpoint | value=spec.rules", //TODO
 }
 var COLS = {
+  node: 'Name,Labels,Ready,CPU-Req,CPU-Lmt,Mem-Req,Mem-Lmt,Age',
   deployment: 'Name,Deploy-Selector,Strategy,Images,Age,Action',
   ing: 'Name,Endpoint,Age,Action',
-  svc: 'Name,Selector,ClusterIP,Endpoint,Age,Action',
+  svc: 'Name,Selector,ClusterIP,Service-Endpoint,Age,Action',
 }
 var DEFAULT_COLS = 'Name,Node,Status,Restarts,Age,Action'
 

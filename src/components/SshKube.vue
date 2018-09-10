@@ -27,7 +27,7 @@
       -->
     </form>
     
-    <div class="console"></div>
+    <div class="console" @resize="console.log('xxxx')"></div>
 
     <v-snackbar top right absolute :color="'info'"
                 v-model="snackbar.show" :timeout="snackbar.timeout" >
@@ -51,6 +51,7 @@ Terminal.applyAddon(fit);
 import clipboard from 'clipboard-polyfill/build/clipboard-polyfill.promise';
 
 // variable not in vue
+var term_height = -1;
 var term_char_height = -1;
 
 export default {
@@ -94,6 +95,7 @@ export default {
       this.con.items = _new.con.items
       this.con.selected = _new.con.items[0]
       this.endpoint = `/api/v1/namespaces/${this.ns}/pods/${this.pod}`
+      this.full = _new.full
 
       if(!_new.show){
         this.terminal.term.reset()
@@ -133,6 +135,38 @@ export default {
       }
     },
     resize () {
+      var term = this.terminal.term
+      var parentElementStyle = window.getComputedStyle(term.element.parentElement);
+      var attr = {
+        parent: {
+          width: Math.max(0, parseInt(parentElementStyle.getPropertyValue('width'))),
+          height: parseInt(parentElementStyle.getPropertyValue('height')),
+        }
+      }
+      console.log('term.', attr)
+
+
+      var x = this.full ? window.innerWidth : 1000;
+      var y = this.full ? window.innerHeight : window.innerHeight * 0.9;
+      var ratio2 = this.full ? 0.7 : 0.55
+      var ratio1 = y / x
+      var height1 = x * ratio1
+      //var height1 = attr.parent.width * ratio1
+      var height2 = y * ratio2
+      var height = Math.min(height1, height2)
+      console.log(this.full, `x=${x}, y=${y}`, `ratio=[${ratio1}, ${ratio2}]`, `parent=[width=${attr.parent.width}, hgieht=${attr.parent.height}]`, height)
+
+      if(term_height != height){
+        term_height = height
+
+        var wrapper = document.getElementsByClassName('console')[0]
+        if(wrapper){
+          wrapper.style['min-height'] = height + 'px'
+          wrapper.style['max-height'] = height + 'px'
+        }
+        term.fit()
+      }
+
       /*
        * Detect change of font size.
        * Tracking height of the single charactor span.
@@ -249,5 +283,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.console { height: 100%; }
+.console { min-height: 100%; }
 </style>
