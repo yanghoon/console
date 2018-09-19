@@ -10,7 +10,8 @@ import vuetify from './modules/vuetify'
 import codemirror from './modules/codemirror'
 //import xterm from './modules/'
 
-import App from './App'
+import App  from './App'
+import App2 from './App2'
 import ssh from '@/components/SshKube'
 import log from '@/components/SshLog'
 
@@ -24,6 +25,6 @@ Vue.component(log.name, log)  // https://stackoverflow.com/a/44568550
 new Vue({
   el: '#app',
   router,
-  components: { App },
-  template: '<App/>'
+  components: { App2 },
+  template: '<App2/>'
 })

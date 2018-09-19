@@ -141,9 +141,13 @@ app.ws('/api/shell', function(client, req){
   }
 
   var cs = _.find(conf.clusters, (c) => {return c.name == req.query.cs}).cluster
-  var token = _.map(conf.users, (u) => {return u.user && u.user.token})[0]
+  var token = _.map(conf.users, (u) => {
+    var token = _.propertyOf(u)('user.token'.split('.'))
+      || _.propertyOf(u)('user.auth-provider.config.id-token'.split('.'))
+    return token
+  })[0]
 
-  //var server = cs.server.replace(/http/, 'ws') 
+  //var server = cs.server.replace(/http/, 'ws')
   var server = cs.server
   var protocol = 'base64.channel.k8s.io'
   var endpoint = `/api/v1/namespaces/${req.query.ns}/pods/${req.query.pod}`

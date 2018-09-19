@@ -114,8 +114,8 @@
 
                 <!-- Ingress Rules -->
                 <template v-else-if="meta.slot == 'ingress'">
-                  <div v-for="rule in props.item.spec.rules" class="mb-2">
-                    <v-tooltip v-for="svc in rule.http.paths" style="display: block;"
+                  <div v-for="rule in props.item.spec.rules">
+                    <v-tooltip v-for="svc in rule.http.paths" style="display: block;" class="mb-2"
                                right :open-delay="0.3" :close-delay="0.3" :key="svc.path">
                       <a slot="activator" target="_blank" :href="`${props.item.spec.tls ? 'https' : 'http'}://${rule.host}${svc.path || ''}`">
                         {{ `${props.item.spec.tls ? 'https' : 'http'}://${rule.host}${svc.path || ''}` }}
@@ -241,10 +241,13 @@ var meta = {
   "Service-Endpoint":"text=Endpoint | value=spec.rules", //TODO
 }
 var COLS = {
+  clusterroles: 'Name,Labels,Age,Action',
   node: 'Name,Labels,Ready,CPU-Req,CPU-Lmt,Mem-Req,Mem-Lmt,Age',
   deployment: 'Name,Deploy-Selector,Strategy,Images,Age,Action',
   ing: 'Name,Endpoint,Age,Action',
   svc: 'Name,Selector,ClusterIP,Service-Endpoint,Age,Action',
+  cm: 'Name,Age,Action',
+  secrets: 'Name,Age,Action',
 }
 var DEFAULT_COLS = 'Name,Node,Status,Restarts,Age,Action'
 
@@ -301,7 +304,8 @@ export default {
             {text:"PersistentVolumeClaim", value:"pvc"},
             {text:"StatefulSets", value:"statefulset"},
             {text:"CronJob", value:"cronjob"},
-            {text:"Job", value:"job"}
+            {text:"Job", value:"job"},
+            {text:"ClusterRoles", value:"clusterroles"},
           ]
         },
       ],
