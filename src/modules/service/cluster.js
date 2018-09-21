@@ -33,7 +33,7 @@ module.exports = {
 	      		cs.cluster['certificate-authority'] = ''
 
 	      		var tmp = yaml.safeDump(conf)
-	      		fs.writeFile(file, tmp, 'utf8')
+	      		fs.writeFileSync(file, tmp, 'utf8')
       		}
       	})
       }

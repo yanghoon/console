@@ -13,6 +13,7 @@ var K8s = require('k8s')
 // service
 const _ = require('underscore');
 const path = require("path");
+const fs = require('fs');
 var cluster = require('./modules/service/cluster');
 
 app.use(express.static("dist"));
@@ -257,7 +258,11 @@ app.post('/api/file/upload', function(req, res) {
   let file = req.files.data;
  
   // Use the mv() method to place the file somewhere on your server
-  var target = path.join(cluster.getRootPath(), file.name);
+  var ROOT = cluster.getRootPath();
+  if(!fs.existsSync(ROOT))
+    fs.mkdirSync(ROOT);
+
+  var target = path.join(ROOT, file.name);
   file.mv(target, function(err) {
     if (err)
       return res.status(500).send(err);
