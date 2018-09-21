@@ -239,6 +239,8 @@ var meta = {
   "ClusterIP":"align=left | value=spec.clusterIP",
   "Selector":"align=left | value=spec.selector | slot=label",
   "Service-Endpoint":"text=Endpoint | value=spec.rules", //TODO
+  // RoleBinding
+  "Role":"value=roleRef.name",
 }
 var COLS = {
   clusterroles: 'Name,Labels,Age,Action',
@@ -246,10 +248,10 @@ var COLS = {
   deployment: 'Name,Deploy-Selector,Strategy,Images,Age,Action',
   ing: 'Name,Endpoint,Age,Action',
   svc: 'Name,Selector,ClusterIP,Service-Endpoint,Age,Action',
-  cm: 'Name,Age,Action',
-  secrets: 'Name,Age,Action',
+  pod: 'Name,Node,Status,Restarts,Age,Action',
+  rolebinding: 'Name,Role,Age,Action',
 }
-var DEFAULT_COLS = 'Name,Node,Status,Restarts,Age,Action'
+var DEFAULT_COLS = 'Name,Age,Action'
 
 function expandFields(cols){
   var arr = [];
@@ -306,6 +308,7 @@ export default {
             {text:"CronJob", value:"cronjob"},
             {text:"Job", value:"job"},
             {text:"ClusterRoles", value:"clusterroles"},
+            {text:"RoleBinding", value:"rolebinding"},
           ]
         },
       ],
