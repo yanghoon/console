@@ -1,6 +1,13 @@
-# board
+# Console (for Kubernetes)
 
 > A Vue.js project
+
+This app will be installed in k8s cluster and supports to use it easy.
+
+Main functionalities
+1. Web SSH : Can use commands in the browser with k8s authentication(ServiceAccount). (`kubectl`, `helm`, ...)
+2. Intuitive Resource Browsing : ...
+3. Configurable UI : Menu, ...
 
 ## Build Setup
 
