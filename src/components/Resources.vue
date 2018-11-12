@@ -39,10 +39,22 @@
                           append-icon="search" label="Search"></v-text-field>
           </v-card-title>
 
-          <v-data-table :headers="table.headers" :items="table.items" :loading="table.loading" :search="table.keyword" hide-actions class="elevation-1">
+          <v-data-table :headers="table.headers" :items="table.items" :loading="table.loading" :search="table.keyword" hide-actions class="elevation-1" item-key="id">
             <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
 
+            <template slot="expand" slot-scope="props">
+              <v-card>
+                <v-card-text>
+                  <v-layout>
+                    <v-flex xs2> containers </v-flex>
+                    <v-flex xs6 v-for="c in props.item.spec.containers" :key="image"> {{ c.image }}</v-flex>
+                  </v-layout>
+                </v-card-text>
+              </v-card>
+            </template>
+
             <template slot="items" slot-scope="props">
+            <tr @click="props.expanded = !props.expanded">
               <td v-for="meta in table.headers" :class="`text-xs-${meta.align}`">
                 <!-- COMMON: human readable time -->
                 <template v-if="meta.slot == 'from-now'">
@@ -136,6 +148,7 @@
                   {{ _.property(meta.value.split('.'))(props.item) || '-' }}
                 </template>
               </td>
+            </tr>
             </template>
 
             <v-alert slot="no-results" :value="true" color="error" icon="warning">
@@ -289,7 +302,7 @@ export default {
     return {
       pod:{},
       select: [
-        {label: 'Cluster',   items: [], selected: 'zcp-demo'},
+        {label: 'Cluster',   items: [], selected: 'cloudzcp-pou-dev'},
         {label: 'Namespace', items: [], selected: 'zcp-system'},
         {
           label: 'Kind',
@@ -407,7 +420,7 @@ export default {
         .get(`${api}/${kind}/list?cs=${cs}&ns=${ns}`)
         .then((res)=>{
           this.table.headers = this.getTabelHeaders()
-          this.table.items = res.data.items
+          this.table.items = res.data.items.map( (e,i)=>({id: i, ...e}) )
           this.table.loading = false
         })
     },
