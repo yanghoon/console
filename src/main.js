@@ -15,11 +15,14 @@ import App2 from './App2'
 import ssh from '@/components/SshKube'
 import log from '@/components/SshLog'
 
+import ns from '@/components/common/NamespaceSelect'
+
 Vue.config.productionTip = false
 Vue.prototype.$http = Axios
 
 Vue.component(ssh.name, ssh)  // https://stackoverflow.com/a/44568550
 Vue.component(log.name, log)  // https://stackoverflow.com/a/44568550
+Vue.component(ns.name, ns)  // https://stackoverflow.com/a/44568550
 
 /* eslint-disable no-new */
 new Vue({

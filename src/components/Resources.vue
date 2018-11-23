@@ -93,7 +93,7 @@
                 <!-- COMMON: tools -->
                 <template v-else-if="meta.slot == 'action'">
                   <v-tooltip right :open-delay="0.3" :close-delay="0.3">
-                    <v-btn slot="activator" color="primary" flat icon @click="showEditor(props.item)">
+                    <v-btn slot="activator" color="primary" flat icon @click="showEditor(props.item)" disabled>
                       <v-icon>create</v-icon>
                     </v-btn>
                     <span>Edit Yaml</span>
@@ -107,7 +107,7 @@
                   </v-tooltip>
 
                   <v-tooltip right :open-delay="0.3" :close-delay="0.3" v-if="select[2].selected == 'pod'">
-                    <v-btn slot="activator" color="primary" flat icon @click="showLog(props.item)">
+                    <v-btn slot="activator" color="primary" flat icon @click="showLog(props.item)" disabled>
                       <v-icon>notes</v-icon>
                     </v-btn>
                     <span>Logs</span>
@@ -303,25 +303,25 @@ export default {
       pod:{},
       select: [
         {label: 'Cluster',   items: [], selected: 'cloudzcp-pou-dev'},
-        {label: 'Namespace', items: [], selected: 'zcp-system'},
+        {label: 'Namespace', items: [], selected: 'default'},
         {
           label: 'Kind',
           selected: '',
           items: [
-            {text:"Node", value:"node"},
-            {text:"Deployment", value:"deployment"},
+            // {text:"Node", value:"node"},
+            // {text:"Deployment", value:"deployment"},
             {text:"Pod", value:"pod"},
             {text:"Service", value:"svc"},
-            {text:"Ingress", value:"ing"},
+            // {text:"Ingress", value:"ing"},
             {text:"ConfigMap", value:"cm"},
             {text:"Secret", value:"secrets"},
-            {text:"PersistentVolume", value:"pv"},
+            // {text:"PersistentVolume", value:"pv"},
             {text:"PersistentVolumeClaim", value:"pvc"},
-            {text:"StatefulSets", value:"statefulset"},
-            {text:"CronJob", value:"cronjob"},
-            {text:"Job", value:"job"},
-            {text:"ClusterRoles", value:"clusterroles"},
-            {text:"RoleBinding", value:"rolebinding"},
+            // {text:"StatefulSets", value:"statefulset"},
+            // {text:"CronJob", value:"cronjob"},
+            // {text:"Job", value:"job"},
+            // {text:"ClusterRoles", value:"clusterroles"},
+            // {text:"RoleBinding", value:"rolebinding"},
           ]
         },
       ],

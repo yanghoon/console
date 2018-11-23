@@ -12,9 +12,12 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
         "/api": {
-            target: "http://localhost:3001",
+            // target: "http://localhost:3001",
+            target: "http://localhost:8181",
             ws: true
-        }
+        },
+        "/dummy": { target: "http://localhost:8181" },
+        "/iam": { target: "http://localhost:8181" }
     },
 
     // Various Dev Server settings

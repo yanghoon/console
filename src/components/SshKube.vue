@@ -71,7 +71,7 @@ export default {
       pod: undefined,
       con: {},
       shell: {
-        selected: 'bash',
+        selected: 'sh',
         items: ['bash', 'sh']
       },
       ws: undefined,
@@ -89,6 +89,7 @@ export default {
   methods: {
     bindProps (_new) {
       console.log('change meta')
+      this.api = _new.api
       this.cs = _new.cs
       this.ns = _new.ns
       this.pod = _new.pod
@@ -108,7 +109,6 @@ export default {
       this.ws && this.ws.close()
     },
     connect () {
-      var api = '/api'
       var term = this.terminal.term
 
       // https://github.com/xtermjs/xterm.js/issues/943#issuecomment-327367759
@@ -116,7 +116,8 @@ export default {
 
       // https://github.com/websockets/wscat/blob/master/bin/wscat#L248
       var server = location.protocol.replace('http', 'ws') + '//' + location.host
-      var url = `${server}${api}/shell?cs=${this.cs}&ns=${this.ns}&pod=${this.pod}&con=${this.con.selected}&shell=${this.shell.selected}`
+      var api = this.api || '/api/exec';
+      var url = `${server}${api}?cs=${this.cs}&ns=${this.ns}&pod=${this.pod}&con=${this.con.selected}&shell=${this.shell.selected}`
       const ws = new WebSocket(url);
       this.ws = ws
 

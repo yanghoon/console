@@ -5,7 +5,7 @@ import Resources from '@/components/Resources'
 import ResourceDetail from '@/components/ResourceDetail'
 import Codemirror from '@/components/Codemirror'
 import Conf from '@/components/Conf'
-import Ssh from '@/components/Ssh'
+import WebSsh from '@/components/WebSsh'
 
 Vue.use(Router)
 
@@ -38,8 +38,8 @@ export default new Router({
     },
     {
       path: '/ssh',
-      name: 'Ssh',
-      component: Ssh
+      name: 'WebSsh',
+      component: WebSsh
     }
   ]
 })

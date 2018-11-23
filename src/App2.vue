@@ -74,8 +74,8 @@ export default {
     return {
       drawer: null,
       menus: [
-        {title:'Resources', link:'/', icon:'widgets'},
         {title:'Web SSH', link:'/ssh', icon:'web_asset'},
+        {title:'Resources', link:'/', icon:'widgets'},
         {title:'Editor', link:'/code', icon:'create'},
         {title:'Configure', link:'/conf', icon:'settings'}
       ]
