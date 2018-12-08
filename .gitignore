@@ -10,6 +10,10 @@ yarn-error.log*
 /test/.*
 selenium-debug.log
 
+spring/bin*
+spring/build*
+spring/.gradle*
+
 # Editor directories and files
 .idea
 .vscode
