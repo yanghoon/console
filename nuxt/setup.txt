@@ -1,0 +1,11 @@
+Create Project
+* starter template : https://github.com/nuxt-community/starter-template/tree/master/template
+* 처음부터-시작하기
+  - https://ko.nuxtjs.org/guide/installation#%EC%B2%98%EC%9D%8C%EB%B6%80%ED%84%B0-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0
+* Routing
+  - https://ko.nuxtjs.org/guide/routing
+* Layouts
+  - https://ko.nuxtjs.org/guide/views#%EB%A0%88%EC%9D%B4%EC%95%84%EC%9B%83
+
+Arch
+* https://sites.google.com/site/yongheuicho/class/cloud/nuxtjssayongbangbeob

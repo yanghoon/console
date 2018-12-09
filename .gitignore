@@ -14,6 +14,9 @@ spring/bin*
 spring/build*
 spring/.gradle*
 
+nuxt/node_modules/
+nuxt/.nuxt
+
 # Editor directories and files
 .idea
 .vscode
