@@ -17,3 +17,7 @@ vue init webpack
 ? Pick a test runner jest
 ? Setup e2e tests with Nightwatch? Yes
 ? Should we run `npm install` for you after the project has been created? (recommended) yarn
+
+
+# vue-page-router (https://www.npmjs.com/package/vue-page-router)
+yarn add vue-page-router
