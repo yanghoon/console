@@ -1,21 +1,70 @@
 package com.console.websocket.sample;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.Observable;
 
 // https://github.com/jacek-marchwicki/JavaWebsocketClient
 public class Main2 {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         // https://github.com/ReactiveX/RxJava/wiki/Creating-Observables#create
-        handshaker()
-            .flatMap(Main2::relay)
-            .subscribe(System.out::println);
+        // handshaker()
+        //     .flatMap(Main2::relay)
+        //     .subscribe(System.out::println);
+
+        ScheduledExecutorService service = Executors.newScheduledThreadPool(5);
+        AtomicInteger counter = new AtomicInteger(0);
+        Runnable command = new Runnable(){
+            private SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+            public void run() {
+                Thread t = Thread.currentThread();
+                // try {
+                    int count = counter.incrementAndGet();
+                    // if(5 <= count){
+                    //     System.out.format("%s - %s-%-2d :: shutdown all\n", format.format(new Date()), t.getName(), t.getId());
+
+                    //     if(count == 5)
+                    //         t.sleep(5 * 1000);
+                    //     else
+                    //         t.wait();
+
+                    //     // service.shutdown();
+                    //     service.awaitTermination(1, TimeUnit.SECONDS);
+                    // }
+
+                    System.out.format("%s - %s-%-2d :: %s\n", format.format(new Date()), t.getName(), t.getId(), count);
+                    // t.sleep(5 * 1000);
+                    // System.out.format("%s - %s-%-2d awake\n", format.format(new Date()), t.getName(), t.getId());
+
+                    // t.wait();
+                    System.out.format("%s - %s-%-2d down\n", format.format(new Date()), t.getName(), t.getId());
+                // } catch (InterruptedException e) {
+                //     System.out.format("%s - %s-%-2d interrupted\n", format.format(new Date()), t.getName(), t.getId());
+                // }
+            }
+        };
+        //service.scheduleAtFixedRate(command, 0, 1, TimeUnit.SECONDS);
+        service.submit(command);
+        service.submit(command);
+        service.submit(command);
+        service.submit(command);
+        service.submit(command);
+        service.submit(command);
+        service.submit(command);
+
+        System.out.println(service.isShutdown());
+        System.out.println(service.isTerminated());
+
+        // Thread.currentThread().sleep(1000 * 10);
     }
 
     // https://github.com/ReactiveX/RxJava/wiki/Creating-Observables#fromfuture
