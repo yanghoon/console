@@ -1,6 +1,7 @@
 <template>
   <div>
     <div>My blog navigation bar here</div>
-    <nuxt/>
+    <!-- <nuxt/> -->
+    <router-view/>
   </div>
 </template>

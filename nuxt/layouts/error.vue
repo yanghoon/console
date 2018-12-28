@@ -2,7 +2,8 @@
   <div class="container">
     <h1 v-if="error.statusCode === 404">Page Not Found</h1>
     <h1 v-else>An error occurred</h1>
-    <nuxt-link to="/">Home page</nuxt-link>
+    <!-- <nuxt-link to="/">Home page</nuxt-link> -->
+    <router-link to="/">Home page</router-link>
   </div>
 </template>
 

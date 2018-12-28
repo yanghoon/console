@@ -27,3 +27,15 @@ create src/plugins/index.js   # export all modules in plugins folder
 create src/plugins/router.js
 
 load plugins at main.js       # load all modules as filename
+
+
+# vue-extended-layout (https://www.npmjs.com/package/vue-extend-layout)
+yarn add vue-extend-layout
+
+add vue-extend-layouts component and change tempalte at App.vue (<vue-extend-layouts/>)
+add 'layout' property of Component to VueRouter route.meta
+
+
+# component auto registration (https://vuejs.org/v2/guide/components-registration.html#Automatic-Global-Registration-of-Base-Components)
+register components automatically in src/components (support subdir and .vue/.js type)
+

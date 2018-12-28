@@ -5,7 +5,12 @@ const req = require.context('.', true, /js$/)
 const plugins = {}
 req.keys().forEach(k => {
   var name = Path.basename(k, '.js')
-  plugins[name] = req(k).default
+  var module = req(k).default
+
+  // no defaults is exclude
+  if (module) {
+    plugins[name] = module
+  }
 })
 
 export default plugins

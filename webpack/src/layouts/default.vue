@@ -1,6 +1,7 @@
 <template>
   <div>
-    <nuxt/>
-    xxxx
+    <!-- <nuxt/> -->
+    <router-view/>
+    Welcome
   </div>
 </template>
