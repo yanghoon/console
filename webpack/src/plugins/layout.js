@@ -7,4 +7,4 @@ function convert (route) {
 }
 
 // http://www.daleseo.com/js-module-import/
-export default { convert }
+export { convert }

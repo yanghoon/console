@@ -36,6 +36,14 @@ add vue-extend-layouts component and change tempalte at App.vue (<vue-extend-lay
 add 'layout' property of Component to VueRouter route.meta
 
 
-# component auto registration (https://vuejs.org/v2/guide/components-registration.html#Automatic-Global-Registration-of-Base-Components)
-register components automatically in src/components (support subdir and .vue/.js type)
+# Component auto-registration (https://vuejs.org/v2/guide/components-registration.html#Automatic-Global-Registration-of-Base-Components)
+add src/plugins/components.js
+  - register components automatically in src/components (support subdir and .vue/.js type)
 
+
+# Change service port (http://afrobambacar.github.io/2017/03/proccess-env-of-nodejs.html)
+yarn add cross-env
+edit package.json (add env variable PORT)
+
+# Support Nuxt Component
+add src/plugins/components-nuxt.js (use vue lifecycle hooks - beforeCreate)

@@ -4,12 +4,15 @@ import Path from 'path'
 const req = require.context('.', true, /js$/)
 const plugins = {}
 req.keys().forEach(k => {
-  var name = Path.basename(k, '.js')
-  var module = req(k).default
+  var module = req(k)
+  var name = module.name || Path.basename(k, '.js')
 
-  // no defaults is exclude
-  if (module) {
-    plugins[name] = module
+  /*
+   * no defaults is exclude
+   * - http://asfirstalways.tistory.com/273
+   */
+  if (module.default) {
+    plugins[name] = module.default
   }
 })
 

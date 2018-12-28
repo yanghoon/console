@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Path from 'path'
-import Layout from './layout'
+import * as Layout from './layout'
 
 /* START from vue-page-router */
 // import PageRouter from 'vue-page-router'
