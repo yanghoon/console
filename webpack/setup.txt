@@ -21,3 +21,9 @@ vue init webpack
 
 # vue-page-router (https://www.npmjs.com/package/vue-page-router)
 yarn add vue-page-router
+
+create src/plugins
+create src/plugins/index.js   # export all modules in plugins folder
+create src/plugins/router.js
+
+load plugins at main.js       # load all modules as filename
