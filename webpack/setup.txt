@@ -47,3 +47,18 @@ edit package.json (add env variable PORT)
 
 # Support Nuxt Component
 add src/plugins/components-nuxt.js (use vue lifecycle hooks - beforeCreate)
+
+
+# Setup vuetiry (https://vuetifyjs.com/ko/getting-started/quick-start - Existing applications)
+# - http://beomy.tistory.com/40
+npm install vuetify --save
+yarn install
+add src/plugins/vuetify.js
+edit index.html (add Material Icons link)
+edit layouts/default.vue (add v-app component and change tags)
+
+
+# Setup vuex (https://nuxtjs.org/guide/vuex-store#classic-mode)
+yarn add vuex
+add modules (src/store/index.js, src/plugins/store.js)
+edit src/layouts/default.vue (use mapState(), )

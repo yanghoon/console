@@ -5,7 +5,7 @@
   "author": "yanghoon <ssang276@hanmail.net>",
   "private": true,
   "scripts": {
-    "dev": "cross-env PORT=3000 webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
+    "dev": "cross-env PORT=3000 HOST=0.0.0.0 webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
     "unit": "jest --config test/unit/jest.conf.js --coverage",
     "e2e": "node test/e2e/runner.js",
@@ -16,7 +16,9 @@
   "dependencies": {
     "vue": "^2.5.2",
     "vue-extend-layout": "^2.0.6",
-    "vue-page-router": "^1.0.3"
+    "vue-page-router": "^1.0.3",
+    "vuetify": "^1.4.0",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
