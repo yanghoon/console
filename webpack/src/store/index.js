@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import _ from 'underscore'
+import axios from 'axios'
 
 Vue.use(Vuex)
 
@@ -39,7 +40,7 @@ const mutations = {
 
 const actions = {
   getNamespace (store) {
-    this.$http
+    axios
       .get(`/api/cluster/${state.select[0].selected}/namespace/list`)
       .then((res) => {
         store.commit('setNamespaceItem', res.data.items)

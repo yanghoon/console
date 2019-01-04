@@ -35,8 +35,8 @@ export default {
     ...mapMutations(['changeCluster', 'chageNamespace']),
     ...mapActions(['getNamespace'])
   },
-  mounted: () => {
-    this.$store.dispatch('getNamespace')
+  created () {
+    // IMPORTANT!! https://github.com/vuejs/vue-test-utils/issues/107
     this.getNamespace()
   }
   // nuxt-api (https://ko.nuxtjs.org/api/pages-fetch)
