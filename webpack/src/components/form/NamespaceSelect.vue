@@ -1,5 +1,6 @@
 <template>
   <v-layout row wrap align-center justify-start>
+    <!--
     <v-flex xs2>
       <v-select :items="select[0].items"
         item-text="name" item-value="name" auto
@@ -8,10 +9,11 @@
     </v-flex>
 
     <div class="text-md-center"> <span>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</span> </div>
+    -->
 
     <v-flex xs2>
       <v-select :items="select[1].items"
-        item-text="metadata.name" item-value="metadata.name" auto
+        item-text="metadata.name" item-value="metadata.name" menu-props="auto"
         :label="select[1].label" v-model="select[1].selected">
       </v-select>
     </v-flex>
@@ -19,46 +21,25 @@
 </template>
 
 <script>
+import { mapState, mapMutations, mapActions } from 'vuex'
+
 export default {
   name: 'ns-select',
   data () {
     return {
-      pod: {},
-      select: [
-        {label: 'Cluster', items: [], selected: 'cloudzcp-pou-dev'},
-        {label: 'Namespace', items: [], selected: 'default'}
-      ]
+      pod: {}
     }
   },
-  watch: {
-    select: {
-      handler (_new, _old) { this.$emit('change', _new) },
-      deep: true
-    }
-  },
-  mounted () {
-    this.getCluster()
-    this.select[0].selected && this.changeCluster()
-  },
+  computed: mapState(['select']),
   methods: {
-    getCluster () {
-      var api = '/api'
-
-      this.$http
-        .get(`${api}/cluster/list`)
-        .then((res) => {
-          this.select[0].items = res.data
-        })
-    },
-    changeCluster () {
-      var api = '/api'
-
-      this.$http
-        .get(`${api}/cluster/${this.select[0].selected}/namespace/list`)
-        .then((res) => {
-          this.select[1].items = res.data.items
-        })
-    }
+    ...mapMutations(['changeCluster', 'chageNamespace']),
+    ...mapActions(['getNamespace'])
+  },
+  mounted: () => {
+    this.$store.dispatch('getNamespace')
+    this.getNamespace()
   }
+  // nuxt-api (https://ko.nuxtjs.org/api/pages-fetch)
+  // fetch: function(){}
 }
 </script>

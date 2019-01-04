@@ -4,9 +4,9 @@
       <v-text-field v-show="false" v-model="endpoint" label="Pod Endpoint" readonly></v-text-field>
 
       <v-layout row align-center justify-start>
-        <v-select :items="con.items" v-model="con.selected" label="Container" auto></v-select>
+        <v-select :items="con.items" v-model="con.selected" label="Container" menu-props="auto"></v-select>
         <div class="text-md-center"> <span>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</span> </div>
-        <v-select :items="shell.items" v-model="shell.selected" label="Shell" auto></v-select>
+        <v-select :items="shell.items" v-model="shell.selected" label="Shell" menu-props="auto"></v-select>
 
         <v-spacer></v-spacer>
 

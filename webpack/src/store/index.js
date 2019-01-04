@@ -10,6 +10,10 @@ const state = {
     {title: 'Web SSH', link: '/ssh', icon: 'web_asset'},
     {title: 'Editor', link: '/code', icon: 'create'},
     {title: 'Configure', link: '/conf', icon: 'settings'}
+  ],
+  select: [
+    {label: 'Cluster', items: [], selected: 'cloudzcp-pou-dev'},
+    {label: 'Namespace', items: [], selected: 'zcp-system'}
   ]
 }
 
@@ -21,12 +25,34 @@ const mutations = {
     } else {
       state.menus[index] = menu
     }
+  },
+  changeCluster (state, cluster) {
+    state.select[0].selected = cluster
+  },
+  changeNamespace (state, namespace) {
+    state.select[1].selected = namespace
+  },
+  setNamespaceItem (state, items) {
+    state.select[1].items = items
+  }
+}
+
+const actions = {
+  getNamespace (store) {
+    this.$http
+      .get(`/api/cluster/${state.select[0].selected}/namespace/list`)
+      .then((res) => {
+        store.commit('setNamespaceItem', res.data.items)
+      })
   }
 }
 
 const store = new Vuex.Store({
   state,
-  mutations
+  mutations,
+  actions
 })
+
+Vue.prototype.$store = store
 
 export default store

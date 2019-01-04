@@ -62,3 +62,9 @@ edit layouts/default.vue (add v-app component and change tags)
 yarn add vuex
 add modules (src/store/index.js, src/plugins/store.js)
 edit src/layouts/default.vue (use mapState(), )
+
+
+# Webpack Dev Server Proxy (https://vuejs-templates.github.io/webpack/proxy.html)
+yarn add axios
+add src/plugins/http.js
+edit config/index.js (add '/api -> /iam' at dev.proxyTable)

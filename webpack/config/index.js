@@ -3,6 +3,12 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
+const path2regx = require('path-to-regexp')
+
+const URL = {
+  cs: path2regx('/api/cluster/list'),
+  ns: path2regx('/api/cluster/:cs/namespace/list')
+}
 
 module.exports = {
   dev: {
@@ -10,7 +16,18 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      "/api": {
+        target: "http://localhost:8182",
+        pathRewrite: function (path, req) {
+          if ( URL.ns.exec(path) ) {
+            return '/clusterList.json'
+          } else if ( URL.ns.exec(path) ) {
+            return '/iam/rbac/ssang276/namespace'
+          }
+        }
+      }
+    },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST

@@ -6,7 +6,7 @@
       <v-list dense class="grey lighten-4">
         <v-subheader>
           Samples
-          <v-btn icon small color="info" @click="applyMenu(menu)">
+          <v-btn icon color="info" @click="applyMenu(menu)">
             <v-icon dark>add</v-icon>
           </v-btn>
         </v-subheader>
