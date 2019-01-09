@@ -42,6 +42,8 @@
 // import WebSocketClient from 'ws'
 // import * as io from 'socket.io-client'  // https://github.com/gdi2290/angular-starter/issues/221
 // import eio from 'engine.io-client'
+// import { mapState, mapMutations, mapActions } from 'vuex'
+import { mapState } from 'vuex'
 
 import clipboard from 'clipboard-polyfill/build/clipboard-polyfill.promise'
 
@@ -63,11 +65,12 @@ export default {
       deep: true
     }
   },
+  computed: mapState(['ns']),
   data () {
     return {
       endpoint: '',
       cs: undefined,
-      ns: undefined,
+      // ns: undefined,
       pod: undefined,
       con: {},
       shell: {
@@ -91,7 +94,7 @@ export default {
       console.log('change meta')
       this.api = _new.api
       this.cs = _new.cs
-      this.ns = _new.ns
+      // this.ns = _new.ns
       this.pod = _new.pod
       this.con.items = _new.con.items
       this.con.selected = _new.con.items[0]

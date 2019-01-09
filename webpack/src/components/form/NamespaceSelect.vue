@@ -14,7 +14,7 @@
     <v-flex xs2>
       <v-select :items="select[1].items"
         item-text="metadata.name" item-value="metadata.name" menu-props="auto"
-        :label="select[1].label" v-model="select[1].selected">
+        :label="select[1].label" v-model="ns">
       </v-select>
     </v-flex>
   </v-layout>
@@ -22,6 +22,7 @@
 
 <script>
 import { mapState, mapMutations, mapActions } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   name: 'ns-select',
@@ -30,7 +31,10 @@ export default {
       pod: {}
     }
   },
-  computed: mapState(['select']),
+  computed: {
+    ...mapState(['select']),
+    ...mapFields(['ns'])
+  },
   methods: {
     ...mapMutations(['changeCluster', 'chageNamespace']),
     ...mapActions(['getNamespace'])
