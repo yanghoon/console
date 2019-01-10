@@ -1,5 +1,8 @@
 <template>
-  <v-data-table class="elevation-1" item-key="id" :items="data" :headers="headers">
+  <v-data-table class="elevation-1"
+      :headers="header"
+      :items="data" item-key="id"
+      :loading="loading">
     <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
 
     <v-alert slot="no-results" :value="true" color="error" icon="warning">
@@ -7,21 +10,82 @@
     </v-alert>
 
     <!--
+      - FINAL -
+      https://github.com/vuejs/vue/pull/7765
+      https://github.com/vuejs/vue/pull/7765#issuecomment-431553973
+
+      - OTHERS -
       https://github.com/vuejs/vue/issues/7464
       https://gist.github.com/elpete/7068308c5a1bf4f1a0f44f8d0259a9a2#file-managelists-vue-L4
     -->
-    <template slot="items" slot-scope="props">
-      <slot name="items" v-bind="props"></slot>
+    <template slot="items" slot-scope="scope">
+      <!-- replace all tbody -->
+      <slot name="items" v-bind="scope" v-if="!!$scopedSlots.items"/>
+
+      <!-- replace each cell -->
+      <template v-else>
+        <tr>
+          <td v-for="h in header" :key="h.text">
+            <!-- customized cell by header.id -->
+            <slot :name="h.id" v-if="!!$scopedSlots[h.id]"
+              v-bind="scope" :header="h" :val="_.property(h.value.split('.'))(scope.item)">
+            </slot>
+            <slot v-else>
+              {{ _.property(h.value.split('.'))(scope.item) || '-' }}
+            </slot>
+          </td>
+        </tr>
+      </template>
     </template>
 
   </v-data-table>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import _ from 'underscore'
+
+function expand (expr, name) {
+  var opt = {id: name.toLowerCase(), text: name, align: 'center', sortable: false, value: ''}
+  expr.split(/ ?\| ?/).forEach(token => {
+    // https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
+    var [op1, op2] = token.split('=')
+    switch (op1) {
+      case 'sortable': opt.sortable = true; break
+      case 'value':
+      case 'align':
+      default: opt[op1] = op2; break
+    }
+  })
+  return opt
+}
+
+const HEADER = _.mapObject({
+  'Name': 'value=metadata.name | sortable | align=left',
+  'Namespace': 'value=metadata.namespace | align=left',
+  'Node': 'value=spec.nodeName',
+  'Status': 'sortable | value=status.phase',
+  'Restarts': 'value=status.containerStatuses',
+  'Age': 'sortable | value=metadata.creationTimestamp',
+  'Action': 'text= | value=none'
+}, expand)
+
 export default {
-  props: 'data, headers'.split(/, ?/),
+  props: 'data, headers, loading'.split(/, ?/),
   data () {
     return {}
+  },
+  computed: {
+    ...mapState(['select', 'ns', 'kind']),
+    header () {
+      var header = this.headers[this.kind]
+      header = _.map(header, (e) => {
+        if (_.isString(e)) {
+          return HEADER[e]
+        }
+      })
+      return header
+    }
   }
 }
 </script>

@@ -1,32 +1,42 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import _ from 'underscore'
 import axios from 'axios'
+import { getField, updateField } from 'vuex-map-fields' // https://github.com/maoberlehner/vuex-map-fields
 
 Vue.use(Vuex)
 
 const state = {
   menus: [
-    {title: 'Resources', link: '/', icon: 'widgets'},
-    {title: 'Web SSH', link: '/ssh', icon: 'web_asset'},
-    {title: 'Editor', link: '/code', icon: 'create'},
-    {title: 'Configure', link: '/conf', icon: 'settings'}
+    {
+      title: 'Resources',
+      link: '/resources',
+      icon: 'widgets',
+      sub: [
+        {title: 'Workloads', link: '/resources/workloads'},
+        {title: 'Network', link: '/resources/network'},
+        {title: 'Volume', link: '/resources/volume'}
+      ]
+    },
+    {title: 'Web SSH', link: '/wsh', icon: 'web_asset'},
+    {title: 'Github', link: 'https://github.com/yanghoon/console', icon: 'info', external: true}
+  ],
+  toolbar: [
+    {title: 'Profile', link: '/wsh'},
+    {title: 'Change Password', link: '/code'},
+    {title: 'Configure', link: '/conf', dvider: true},
+    {title: 'Logout', link: '/logout'}
   ],
   select: [
     {label: 'Cluster', items: [], selected: 'cloudzcp-pou-dev'},
-    {label: 'Namespace', items: [], selected: 'zcp-system'}
-  ]
+    {label: 'Namespace', items: [], selected: 'zcp-system'},
+    {label: 'Kind', items: [], selected: ''}
+  ],
+  ns: '',
+  kind: '',
+  profile: {}
 }
 
 const mutations = {
-  applyMenu (state, menu) {
-    var index = _.findIndex(state.menus, {title: menu.title})
-    if (index === -1) {
-      state.menus.push(menu)
-    } else {
-      state.menus[index] = menu
-    }
-  },
   changeCluster (state, cluster) {
     state.select[0].selected = cluster
   },
@@ -35,7 +45,16 @@ const mutations = {
   },
   setNamespaceItem (state, items) {
     state.select[1].items = items
-  }
+    if (!state.ns) { state.ns = items[0].metadata.name }
+  },
+  setKindItem (state, items) {
+    state.select[2].items = items
+    if (!state.kind) { state.kind = items[0].value }
+  },
+  setProfile (state, profile) {
+    state.profile = profile
+  },
+  updateField
 }
 
 const actions = {
@@ -45,11 +64,21 @@ const actions = {
       .then((res) => {
         store.commit('setNamespaceItem', res.data.items)
       })
+  },
+  getProfile (store) {
+    axios
+      .get('/iam/user/xxx')
+      .then((res) => {
+        store.commit('setProfile', res.data.data)
+      })
   }
 }
 
+const getters = { getField }
+
 const store = new Vuex.Store({
   state,
+  getters,
   mutations,
   actions
 })

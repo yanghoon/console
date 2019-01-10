@@ -4,11 +4,13 @@
 
 const path = require('path')
 const path2regx = require('path-to-regexp')
+const _ = require('underscore')
 
-const URL = {
-  cs: path2regx('/api/cluster/list'),
-  ns: path2regx('/api/cluster/:cs/namespace/list')
-}
+const RULEs = [
+  {regx: path2regx('/api/cluster/list'), val: undefined},
+  {regx: path2regx('/api/cluster/:cs/namespace/list'), val: ''}
+  // {regx: path2regx('/:proxy*'), val: (exec) => exec[1] }
+]
 
 module.exports = {
   dev: {
@@ -18,15 +20,20 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       "/api": {
-        target: "http://localhost:8182",
+        target: "http://localhost:8080",
         pathRewrite: function (path, req) {
-          if ( URL.ns.exec(path) ) {
-            return '/clusterList.json'
-          } else if ( URL.ns.exec(path) ) {
-            return '/iam/rbac/ssang276/namespace'
+          const rule = _.find(RULEs, ({regx}) => regx.test(path)) || {val: path}
+
+          if (typeof rule.val !== 'function') {
+            return rule.val
           }
-        }
-      }
+
+          return rule.val(rule.regx.exec(path), rule)
+        },
+        ws: true
+      },
+      "/iam": "http://localhost:8080",
+      "/login": "http://localhost:8080"
     },
 
     // Various Dev Server settings
