@@ -2,7 +2,8 @@
   <v-data-table class="elevation-1"
       :headers="header"
       :items="data" item-key="id"
-      :loading="loading">
+      :loading="loading"
+      :search="keyword">
     <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
 
     <v-alert slot="no-results" :value="true" color="error" icon="warning">
@@ -61,17 +62,34 @@ function expand (expr, name) {
 }
 
 const HEADER = _.mapObject({
+  // Pod
   'Name': 'value=metadata.name | sortable | align=left',
   'Namespace': 'value=metadata.namespace | align=left',
   'Node': 'value=spec.nodeName',
   'Status': 'sortable | value=status.phase',
   'Restarts': 'value=status.containerStatuses',
-  'Age': 'sortable | value=metadata.creationTimestamp',
-  'Action': 'text= | value=none'
+  'Age': 'sortable | value=metadata.creationTimestamp | align=left',
+  'Action': 'text= | value=none',
+  // Service
+  'ClusterIP': 'align=left | value=spec.clusterIP',
+  'Selector': 'align=left | value=spec.selector',
+  'Service-Endpoint': 'text=Endpoint | value=spec',
+  // ConfigMap
+  'Labels': 'value=metadata.labels | align=left',
+  'Data-Key': 'text=Data | value=data | align=left',
+  // Secrets
+  'Secret-Type': 'text=Type | value=type | align=left',
+  // PVC
+  'Pvc-Status': 'text=Status | value=status.phase',
+  'Volume': 'value=spec.volumeName',
+  // 'Capacity': 'value=spec.resources.requests.storage.number',
+  'Capacity': 'value=status.capacity.storage.number',
+  'Access-Modes': 'value=spec.accessModes',
+  'Storage-Class': 'value=spec.storageClassName'
 }, expand)
 
 export default {
-  props: 'data, headers, loading'.split(/, ?/),
+  props: 'data, headers, loading, keyword'.split(/, ?/),
   data () {
     return {}
   },

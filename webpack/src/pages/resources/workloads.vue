@@ -15,8 +15,29 @@
         {{ val.millis | moment('from', true) || '-' }}
       </template>
       <template slot="restarts" slot-scope="{val}">
-        {{ val[0].restartCount }}
+        {{ val ? val.reduce((s, c) => s + c.restartCount, 0) : '!!!' }}
       </template>
+
+      <!-- Service -->
+      <labels slot="selector" slot-scope="{val}" v-bind:labels="val"/>
+      <template slot="service-endpoint" slot-scope="{item}">
+        {{ item.spec.type === 'LoadBalancer' ? item.status.loadBalancer.ingress[0].ip : item.spec.clusterIP }}
+      </template>
+
+      <!-- ConfigMap -->
+      <labels slot="labels" slot-scope="{val}" v-bind:labels="val"/>
+      <template slot="data-key" slot-scope="{val}">
+        <div v-for="(v, k) in val" :key="k" small>
+          <!-- https://programmingsummaries.tistory.com/239 -->
+          {{ k }} ({{ !!v ? v.length : 0 }} bytes)
+        </div>
+      </template>
+
+      <!-- PVC -->
+      <template slot="capacity" slot-scope="{val}">
+        {{ sizeOf(val) }}
+      </template>
+
     </resource-table>
 
   </layout-content>
@@ -49,10 +70,10 @@ const KIND_ITEMS = [
 
 const HEADERS = {
   pod: 'Name,Node,Status,Restarts,Age,Action'.split(','),
-  svc: [ 'Name', 'Namespace' ],
-  cm: [ 'Name', 'Namespace' ],
-  secrets: [ 'Name', 'Namespace' ],
-  pvc: [ 'Name', 'Namespace' ]
+  svc: 'Name,Selector,ClusterIP,Service-Endpoint,Age,Action'.split(','),
+  cm: 'Name,Data-Key,Age,Action'.split(','),
+  secrets: 'Name,Secret-Type,Data-Key,Age,Action'.split(','),
+  pvc: 'Name,Pvc-Status,Volume,Capacity,Access-Modes,Storage-Class,Age,Action'.split(',')
 }
 
 export default {
@@ -86,6 +107,14 @@ export default {
           this.table.data = res.data.items
           this.table.loading = false
         })
+    },
+    sizeOf (bytes) {
+      // https://stackoverflow.com/a/28120564
+      if (bytes === 0) { return '0.0 Bi' }
+      if (!bytes) { return '-' }
+      var e = Math.floor(Math.log(bytes) / Math.log(1024))
+      var s = (bytes / Math.pow(1024, e)).toFixed(1)
+      return `${s} ${' KMGTP'.charAt(e)}i`
     }
   },
   created () {
