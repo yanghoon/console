@@ -1,4 +1,6 @@
 <template>
+  <div>
+
   <v-data-table class="elevation-1"
       :headers="header"
       :items="data" item-key="id"
@@ -31,6 +33,30 @@
             <slot :name="h.id" v-if="!!$scopedSlots[h.id]"
               v-bind="scope" :header="h" :val="_.property(h.value.split('.'))(scope.item)">
             </slot>
+            <!-- for actions -->
+            <slot v-else-if="h.id === 'action'" v-bind="scope">
+              <v-tooltip right :open-delay="0.3" :close-delay="0.3">
+                <v-btn slot="activator" color="primary" flat icon @click="showDialog('editor', scope.item)">
+                  <v-icon>create</v-icon>
+                </v-btn>
+                <span>Edit Yaml</span>
+              </v-tooltip>
+
+              <v-tooltip right :open-delay="0.3" :close-delay="0.3" v-if="kind === 'pod'">
+                <v-btn slot="activator" color="primary" flat icon @click="showDialog('ssh', scope.item)">
+                  <v-icon>web_asset</v-icon>
+                </v-btn>
+                <span>Open Shell</span>
+              </v-tooltip>
+
+              <v-tooltip right :open-delay="0.3" :close-delay="0.3" v-if="kind === 'pod'">
+                <v-btn slot="activator" color="primary" flat icon @click="showDialog('log', props.item)">
+                  <v-icon>notes</v-icon>
+                </v-btn>
+                <span>Logs</span>
+              </v-tooltip>
+            </slot>
+            <!-- DEFAULT : just print values -->
             <slot v-else>
               {{ _.property(h.value.split('.'))(scope.item) || '-' }}
             </slot>
@@ -40,6 +66,11 @@
     </template>
 
   </v-data-table>
+
+  <!-- dialogs for actions -->
+  <editor-dialog v-bind="dialog.editor" v-model="dialog.editor.open"/>
+
+  </div>
 </template>
 
 <script>
@@ -84,14 +115,21 @@ const HEADER = _.mapObject({
   'Volume': 'value=spec.volumeName',
   // 'Capacity': 'value=spec.resources.requests.storage.number',
   'Capacity': 'value=status.capacity.storage.number',
-  'Access-Modes': 'value=spec.accessModes',
-  'Storage-Class': 'value=spec.storageClassName'
+  'Access-Modes': 'text=Access Modes | value=spec.accessModes',
+  'Storage-Class': 'text=Storage Class | value=spec.storageClassName'
 }, expand)
 
 export default {
   props: 'data, headers, loading, keyword'.split(/, ?/),
   data () {
-    return {}
+    return {
+      dialog: {
+        editor: {
+          open: false,
+          item: {}
+        }
+      }
+    }
   },
   computed: {
     ...mapState(['select', 'ns', 'kind']),
@@ -103,6 +141,12 @@ export default {
         }
       })
       return header
+    }
+  },
+  methods: {
+    showDialog (name, item) {
+      this.dialog[name].open = true
+      this.dialog[name].item = item
     }
   }
 }

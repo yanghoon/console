@@ -37,9 +37,6 @@
       <template slot="capacity" slot-scope="{val}">
         {{ sizeOf(val) }}
       </template>
-      <template slot="access-modes" slot-scope="{val}">
-        {{ val.join(', ') }}
-      </template>
 
     </resource-table>
 

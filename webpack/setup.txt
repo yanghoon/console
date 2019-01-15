@@ -68,3 +68,8 @@ edit src/layouts/default.vue (use mapState(), )
 yarn add axios
 add src/plugins/http.js
 edit config/index.js (add '/api -> /iam' at dev.proxyTable)
+
+
+# Install Codemirror
+yarn add vue-codemirror
+add src/components/table/EditorDialog.vue
