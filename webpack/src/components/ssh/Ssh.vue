@@ -101,7 +101,7 @@ export default {
       this.endpoint = `/api/v1/namespaces/${this.ns}/pods/${this.pod}`
       this.full = _new.full
 
-      if (!_new.show) {
+      if (!_new.show || _new.reset) {
         this.terminal.term.reset()
         this.disconnect()
       } else if (this.terminal.term) {

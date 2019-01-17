@@ -132,11 +132,11 @@ export default {
       this.code = Yaml.dump(obj)
     },
     setCodeWithError (error) {
-      const old_length = this.code_error.join('\n').length
+      const len = this.code_error.join('\n').length
       this.code_error = this._.map(error.split('\n'), v => '# ' + v)
       this.code_error.push('')
       // this.options.firstLineNumber = 1 - error.length
-      this.code = this.code_error.join('\n') + this.code.substr(old_length)
+      this.code = this.code_error.join('\n') + this.code.substr(len)
 
       this.snack.color = 'error'
       this.snack.text = 'Error'

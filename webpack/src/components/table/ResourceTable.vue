@@ -33,6 +33,14 @@
             <slot :name="h.id" v-if="!!$scopedSlots[h.id]"
               v-bind="scope" :header="h" :val="_.property(h.value.split('.'))(scope.item)">
             </slot>
+
+            <!-- for name link -->
+            <slot v-else-if="h.id === 'name'" v-bind="scope">
+              <router-link :to="`/resources/${kind}/${scope.item.metadata.name}?cs=-&ns=${ns}`">
+                {{ _.property(h.value.split('.'))(scope.item) || '-' }}
+              </router-link>
+            </slot>
+
             <!-- for actions -->
             <slot v-else-if="h.id === 'action'" v-bind="scope">
               <v-tooltip right :open-delay="0.3" :close-delay="0.3">
@@ -50,12 +58,13 @@
               </v-tooltip>
 
               <v-tooltip right :open-delay="0.3" :close-delay="0.3" v-if="kind === 'pod'">
-                <v-btn slot="activator" color="primary" flat icon @click="showDialog('log', props.item)">
+                <v-btn slot="activator" color="primary" flat icon @click="showDialog('log', scope.item)">
                   <v-icon>notes</v-icon>
                 </v-btn>
                 <span>Logs</span>
               </v-tooltip>
             </slot>
+
             <!-- DEFAULT : just print values -->
             <slot v-else>
               {{ _.property(h.value.split('.'))(scope.item) || '-' }}
@@ -69,6 +78,7 @@
 
   <!-- dialogs for actions -->
   <editor-dialog v-bind="dialog.editor" v-model="dialog.editor.open"/>
+  <ssh-dialog v-bind="dialog.ssh" v-model="dialog.ssh.open"/>
 
   </div>
 </template>
@@ -124,10 +134,8 @@ export default {
   data () {
     return {
       dialog: {
-        editor: {
-          open: false,
-          item: {}
-        }
+        editor: { open: false, item: {} },
+        ssh: { open: false, item: {} }
       }
     }
   },
