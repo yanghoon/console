@@ -19,6 +19,9 @@ function makeOptions (pages) {
     options.routes.push({ path, component, name: pageName })
   }
 
+  // Support nuxt.js dynamic routes (https://nuxtjs.org/guide/routing#dynamic-routes)
+  options.routes.sort(pathCompareator)
+
   return options
 }
 /** END from vue-page-router */
@@ -36,12 +39,25 @@ function loadPages () {
     var dir = Path.dirname(k)
     var name = Path.basename(k, Path.extname(k))
     var path = ['/', dir, (name !== 'index' ? name : '')]
-    comp.path = Path.join(...path).replace('_', ':')
+    comp.path = Path.join(...path).replace(/_/gi, ':')
 
     console.log(k, '->', comp.path, comp)
 
     return comp
   })
+}
+
+function pathCompareator ({path: s2}, {path: s1}) {
+  var comp = 0
+  for (var i in s1) {
+    if (s1[i] === s2[i]) continue
+    else if (s1[i] === ':') comp = -1 // if contain ':', move to back
+    else if (s2[i] === ':') comp = 10
+    else if (s2[i] === undefined) comp = -1 // s2 is short, move to front
+    // console.log(comp, s1[i], s2[i], s1, s2)
+    return comp
+  }
+  return 10 // 0 <= s2-s1
 }
 
 /** Error handlers */
