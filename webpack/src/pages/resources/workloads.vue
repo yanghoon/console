@@ -12,7 +12,7 @@
 
     <resource-table v-bind="table">
       <template slot="age" slot-scope="{val}">
-        {{ val.millis | moment('from', true) || '-' }}
+        {{ val | moment('from', true) || '-' }}
       </template>
       <template slot="restarts" slot-scope="{val}">
         {{ val ? val.reduce((s, c) => s + c.restartCount, 0) : '!!!' }}
@@ -27,7 +27,7 @@
       <!-- ConfigMap -->
       <labels slot="labels" slot-scope="{val}" v-bind:labels="val"/>
       <template slot="data-key" slot-scope="{val}">
-        <div v-for="(v, k) in val" :key="k" small>
+        <div v-for="(v, k) in val" :key="k" small class="text-truncate">
           <!-- https://programmingsummaries.tistory.com/239 -->
           {{ k }} ({{ !!v ? v.length : 0 }} bytes)
         </div>
