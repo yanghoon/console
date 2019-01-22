@@ -3,7 +3,7 @@
   <v-app class="grey lighten-4">
 
     <v-navigation-drawer v-model="active.drawer" fixed clipped class="grey lighten-4" app>
-      <v-list dense class="grey lighten-4">
+      <v-list dense>
         <v-subheader>
           Samples
         </v-subheader>
@@ -96,7 +96,9 @@
         <v-layout row wrap align-center justify-center>
 
           <v-flex xs11>
-            <namespace-select/>
+            <v-flex xs2>
+              <namespace-select/>
+            </v-flex>
 
             <nuxt/>
             <!-- <v-card>

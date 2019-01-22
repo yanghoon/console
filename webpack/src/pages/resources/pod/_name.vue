@@ -16,6 +16,12 @@
       </router-link>
     </template>
 
+    <template slot="imagePullSecrets" slot-scope="{val}">
+      <div v-for="(s, i) in val" :key="i">
+        {{ s.name }}
+      </div>
+    </template>
+
     <template slot="containers" slot-scope="{val}">
       <div v-for="(v, k) in val" :key="k">
         {{ v.name }}
@@ -66,7 +72,7 @@
           </v-flex>
         </v-layout>
 
-        <v-divider/>
+        <!-- <v-divider/> -->
 
         <!-- <pre>{{ v.livenessProbe }}</pre> -->
         <!-- <pre>{{ v.readinessProbe }}</pre> -->

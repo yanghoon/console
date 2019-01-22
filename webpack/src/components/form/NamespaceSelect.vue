@@ -1,23 +1,12 @@
 <template>
-  <v-layout row wrap align-center justify-start>
-    <!--
-    <v-flex xs2>
-      <v-select :items="select[0].items"
-        item-text="name" item-value="name" auto
-        :label="select[0].label" v-model="select[0].selected" @change="changeCluster">
+    <!-- <v-flex> -->
+      <v-select
+        :label="_.isUndefined(label) || label ? select[1].label : ''"
+        :items="select[1].items"
+        item-text="metadata.name" item-value="metadata.name"
+        v-model="ns" menu-props="auto">
       </v-select>
-    </v-flex>
-
-    <div class="text-md-center"> <span>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</span> </div>
-    -->
-
-    <v-flex xs2>
-      <v-select :items="select[1].items"
-        item-text="metadata.name" item-value="metadata.name" menu-props="auto"
-        :label="select[1].label" v-model="ns">
-      </v-select>
-    </v-flex>
-  </v-layout>
+    <!-- </v-flex> -->
 </template>
 
 <script>
@@ -26,6 +15,7 @@ import { mapFields } from 'vuex-map-fields'
 
 export default {
   name: 'ns-select',
+  props: ['label'],
   data () {
     return {
       pod: {}
