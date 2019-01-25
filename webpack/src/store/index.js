@@ -33,7 +33,10 @@ const state = {
   ],
   ns: '',
   kind: '',
-  profile: {}
+  profile: {},
+  config: {
+    layout: process.env.layout
+  }
 }
 
 const mutations = {
@@ -67,7 +70,7 @@ const actions = {
   },
   getProfile (store) {
     axios
-      .get('/iam/user/xxx')
+      .get('/api/user/id')
       .then((res) => {
         store.commit('setProfile', res.data.data)
       })
