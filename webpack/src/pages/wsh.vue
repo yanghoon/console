@@ -34,7 +34,7 @@ export default {
 
     this.ssh.api = '/api/wsh'
     this.ssh.pod = '-'
-    this.ssh.con.items = ['apline']
+    this.ssh.con.items = ['alpine']
   }
 }
 </script>

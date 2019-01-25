@@ -6,7 +6,7 @@ import Path from 'path'
 /* ref. https://vuejs.org/v2/guide/components-registration.html#Automatic-Global-Registration-of-Base-Components */
 const requireComponent = require.context(
   // The relative path of the components folder
-  '../components',
+  '@/components',
   // Whether or not to look in subfolders
   true,
   // The regular expression used to match base component filenames

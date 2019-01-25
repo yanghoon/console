@@ -1,15 +1,14 @@
-let config = {
-  layout: {
-    // default: 'default2'
-  }
-}
+import store from '@/store'
+const {config} = store.state
+
 function convert (route) {
   var comp = route.component
   if (comp.layout) {
     route.meta = { layout: comp.layout }
     // Router.addRoutes([route])
-  } else if (config.layout.default) {
-    route.meta = { layout: config.layout.default }
+  // } else if (config.layout.default) {
+  } else if (config.layout) {
+    route.meta = { layout: config.layout }
   }
 }
 

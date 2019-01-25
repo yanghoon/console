@@ -29,7 +29,7 @@ function makeOptions (pages) {
 /** Load page components and generate route path */
 function loadPages () {
   // https://www.npmjs.com/package/require-context
-  const req = require.context('../pages', true, /vue$/)
+  const req = require.context('@/pages', true, /vue$/)
   return req.keys().map(k => {
     // '/user/_id'   -> '/user/:id'
     // '/user/index' -> '/user'
@@ -82,7 +82,7 @@ options.routes.push({
   path: '/error',
   name: 'error',
   props: true, // https://router.vuejs.org/guide/essentials/passing-props.html#passing-props-to-route-components
-  component: require('../layouts/error').default
+  component: require('@/layouts/error').default
 })
 
 /** Create VueRouter for exporting */

@@ -1,12 +1,10 @@
 <template>
-    <!-- <v-flex> -->
-      <v-select
-        :label="_.isUndefined(label) || label ? select[1].label : ''"
-        :items="select[1].items"
-        item-text="metadata.name" item-value="metadata.name"
-        v-model="ns" menu-props="auto">
-      </v-select>
-    <!-- </v-flex> -->
+  <v-select
+    :label="_.isUndefined(label) || label ? select[1].label : ''"
+    :items="select[1].items"
+    item-text="metadata.name" item-value="metadata.name"
+    v-model="ns" menu-props="auto">
+  </v-select>
 </template>
 
 <script>
